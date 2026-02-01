@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>The Monk Diamond Discovery</title>
+    <style>
+        /* Reset & Layout */
+        * {
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+        }
+
+        .pad {
+            padding: 25px;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #87ceeb, #4a90e2);
+            color: white;
+            font-size: 36pt;
+            font-weight: bold;
+            text-align: center;
+            padding: 40px 25px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Welcome Banner */
+        .welcome {
+            background-color: #555;
+            color: white;
+            font-size: 18pt;
+            text-align: center;
+            padding: 20px 25px;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        /* Container */
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            padding: 25px;
+        }
+
+        /* Main Content */
+        .main-text {
+            flex: 1 1 65%;
+            background-color: #f5f1e8;
+            padding: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .main-text p {
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+
+        /* Image + Content Layout inside main-text */
+        .main-text .content {
+            display: flex;
+            gap: 20px;
+            align-items: stretch; /* ensure both columns match height */
+        }
+
+        .main-text .text-col {
+            flex: 1 1 60%;
+        }
+
+        .main-text .img-col {
+            flex: 0 0 40%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .team-img {
+            max-height: 100%; /* never taller than the text column */
+            width: auto;
+            max-width: 100%;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            display: block;
+        }
+
+        .maps-section {
+            padding: 25px;
+            background-color: #f5f1e8;
+            margin: 25px;
+            border-radius: 8px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+        }
+
+        .maps-section h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .maps-container {
+            width: 100%;
+            height: 400px;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .maps-container iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                font-size: 24pt;
+            }
+
+            .main-text {
+                flex: 1 1 100%;
+            }
+
+            .main-text .content {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        // Check if user is authenticated
+        if (!sessionStorage.getItem("authenticated")) {
+            window.location.href = "login.html";
+        }
+    </script>
+    <!-- Header -->
+    <div class="header">The Monk Diamond Discovery</div>
+
+    <!-- Welcome Banner -->
+    <p class="welcome">Stolen Diamond Discovered in Siberia!!!</p>
+
+    <!-- Main Content & Sidebar -->
+    <div class="container">
+        <div class="main-text">
+            <div class="content">
+                <div class="text-col">
+                    <p>Professor Bairstone and Dr. Day have made a sensational discovery.<br />
+                        They have discovered the Monk Diamond in a remote cave in Siberia.<br />
+                        Professor Bairstone's dog, Ernest, sniffed out the Diamond.</p>
+
+                    <p>The jewel was stolen three years ago from the House of Volov.<br />
+                        The prime suspects in the theft were the Bond Brothers.<br />
+                        The team thinks the diamond had been hidden by the thieves.<br />
+                        They sent this photo from their camp:</p>
+                </div>
+
+                <div class="img-col">
+                    <img src="team.png" alt="The Team" class="team-img" />
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
