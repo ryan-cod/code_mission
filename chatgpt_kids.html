@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Kids</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23667eea' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' font-weight='bold' fill='white' text-anchor='middle'>C</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .age-verification {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            display: none;
+        }
+
+        .age-verification.active {
+            display: block;
+        }
+
+        .age-verification h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+
+        .age-verification p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .age-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .age-buttons button {
+            padding: 12px 30px;
+            font-size: 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .btn-kid {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-kid:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+        }
+
+        .btn-adult {
+            background: #f0f0f0;
+            color: #333;
+        }
+
+        .btn-adult:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
+        }
+
+        .chat-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            display: none;
+            width: 100%;
+            max-width: 700px;
+            height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-container.active {
+            display: flex;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+        }
+
+        .signout-btn {
+            position: absolute;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .signout-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+            border-color: rgba(255, 255, 255, 0.6);
+        }
+
+        .logo {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 24px;
+        }
+
+        .logo::after {
+            content: 'C';
+            font-size: 28px;
+            font-weight: 900;
+        }
+
+        .header-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            position: relative;
+        }
+
+        .header-title {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .header-kids {
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0.9;
+            position: absolute;
+            bottom: -5px;
+            right: -45px;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            padding: 12px 16px;
+            border-radius: 8px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.user {
+            background: #667eea;
+            color: white;
+            align-self: flex-end;
+        }
+
+        .message.bot {
+            background: #f0f0f0;
+            color: #333;
+            align-self: flex-start;
+        }
+
+        .chat-input-area {
+            padding: 20px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+        }
+
+        .chat-input-area input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .chat-input-area input:focus {
+            border-color: #667eea;
+        }
+
+        .chat-input-area button {
+            padding: 12px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.3s;
+        }
+
+        .chat-input-area button:hover {
+            background: #5568d3;
+        }
+
+        .adult-redirect {
+            background: white;
+            padding: 40px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 500px;
+            display: none;
+        }
+
+        .adult-redirect.active {
+            display: block;
+        }
+
+        .adult-redirect h2 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+
+        .adult-redirect p {
+            color: #666;
+            margin-bottom: 30px;
+            line-height: 1.8;
+            font-size: 16px;
+        }
+
+        .adult-redirect a {
+            display: inline-block;
+            padding: 15px 40px;
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: background 0.3s;
+        }
+
+        .adult-redirect a:hover {
+            background: #5568d3;
+        }
+    </style>
+</head>
+<body>
+    <!-- Age Verification Modal -->
+    <div class="age-verification active" id="ageVerification">
+        <h2>Welcome to ChatGPT Kids! 🎉</h2>
+        <p>This is a safe, child-friendly version of ChatGPT with special protections and content filtering designed just for kids.</p>
+        <p style="font-weight: bold;">Are you under 13?</p>
+        <div class="age-buttons">
+            <button class="btn-kid" onclick="enterAsKid()">Yes, I'm a Kid!</button>
+            <button class="btn-adult" onclick="enterAsAdult()">No, I'm an Adult</button>
+        </div>
+    </div>
+
+    <!-- Adult Redirect -->
+    <div class="adult-redirect" id="adultRedirect">
+        <h2>Welcome, Adult! 👋</h2>
+        <p>This version of ChatGPT Kids is specially designed with safety features and content restrictions for children.</p>
+        <p>For the full ChatGPT experience, please download or visit the official ChatGPT application.</p>
+        <a href="https://chat.openai.com" target="_blank">Go to ChatGPT →</a>
+    </div>
+
+    <!-- Chat Interface -->
+    <div class="chat-container" id="chatContainer">
+        <div class="chat-header">
+            <div class="logo"></div>
+            <div class="header-text">
+                <span class="header-title">ChatGPT</span>
+                <span class="header-kids">Kids</span>
+            </div>
+            <button class="signout-btn" onclick="signOut()">Sign Out</button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                Hello! I'm ChatGPT Kids. I'm here to help you learn, answer questions, and have fun—safely! 
+                What would you like to know today? 📚
+            </div>
+        </div>
+        <div class="chat-input-area">
+            <input type="text" id="userInput" placeholder="Ask me anything (keep it family-friendly!)..." />
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+
+    <script>
+        // Check if user is signed in
+        function checkAuth() {
+            const currentUser = localStorage.getItem('chatgpt_kids_current_user');
+            if (!currentUser) {
+                window.location.href = 'signin.html';
+            }
+        }
+
+        // Check auth on page load
+        window.addEventListener('load', checkAuth);
+        
+        function signOut() {
+            localStorage.removeItem('chatgpt_kids_current_user');
+            window.location.href = 'signin.html';
+        }
+
+        // Restricted topics and phrases (kid-safe filtering)
+        const restrictedKeywords = [
+            'violence', 'weapons', 'drugs', 'alcohol', 'tobacco', 'smoking',
+            'adult content', 'inappropriate', 'explicit', 'harmful', 'hack',
+            'cracking', 'virus', 'malware', 'adult website', 'dating',
+            'romance', 'sexual', 'nude', 'porn', 'suicide', 'self-harm',
+            'bullying', 'hate', 'racist', 'discrimination', 'abuse'
+        ];
+
+        const kidFriendlyResponses = {
+            restricted: "I appreciate your curiosity, but I can't discuss that topic. Let's talk about something else! How about science, history, math, or creative writing instead? 📖",
+            default: "That's an interesting question! Remember to always be kind, curious, and safe online. What else would you like to know? 🌟"
+        };
+
+        function enterAsKid() {
+            document.getElementById('ageVerification').classList.remove('active');
+            document.getElementById('chatContainer').classList.add('active');
+        }
+
+        function enterAsAdult() {
+            document.getElementById('ageVerification').classList.remove('active');
+            document.getElementById('adultRedirect').classList.add('active');
+        }
+
+        function isContentSafe(text) {
+            const lowerText = text.toLowerCase();
+            return !restrictedKeywords.some(keyword => lowerText.includes(keyword));
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('userInput');
+            const message = input.value.trim();
+
+            if (!message) return;
+
+            // Display user message
+            const messagesDiv = document.getElementById('chatMessages');
+            const userMessageDiv = document.createElement('div');
+            userMessageDiv.className = 'message user';
+            userMessageDiv.textContent = message;
+            messagesDiv.appendChild(userMessageDiv);
+
+            // Check content safety
+            let botResponse;
+            if (!isContentSafe(message)) {
+                botResponse = kidFriendlyResponses.restricted;
+            } else {
+                // Generate a simple, friendly response
+                botResponse = generateKidFriendlyResponse(message);
+            }
+
+            // Display bot response after a short delay
+            setTimeout(() => {
+                const botMessageDiv = document.createElement('div');
+                botMessageDiv.className = 'message bot';
+                botMessageDiv.textContent = botResponse;
+                messagesDiv.appendChild(botMessageDiv);
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            }, 500);
+
+            input.value = '';
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        }
+
+        function generateKidFriendlyResponse(userMessage) {
+            const lowerMessage = userMessage.toLowerCase();
+
+            // Simple pattern matching for common kid-friendly questions
+            if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
+                return "Hi there! 👋 It's great to meet you. How can I help you learn something new today?";
+            } else if (lowerMessage.includes('joke')) {
+                const jokes = [
+                    "Why did the math book look sad? Because it had too many problems! 😄",
+                    "What do you call a sleeping bull? A dozer! 🐂",
+                    "Why did the scarecrow win an award? Because he was outstanding in his field! 🌾"
+                ];
+                return jokes[Math.floor(Math.random() * jokes.length)];
+            } else if (lowerMessage.includes('fact')) {
+                const facts = [
+                    "Did you know? Honey never spoils! Archaeologists have found honey in ancient tombs that's over 3,000 years old! 🍯",
+                    "Did you know? The Great Wall of China is about 13,000 miles long! 🏯",
+                    "Did you know? Octopuses have three hearts! 🐙"
+                ];
+                return facts[Math.floor(Math.random() * facts.length)];
+            } else if (lowerMessage.includes('help') || lowerMessage.includes('question')) {
+                return "I'm here to help! I can answer questions about science, history, math, nature, technology, and lots more. Just ask! 🌟";
+            } else {
+                return "That's a cool question! I'm learning to give better answers. In the meantime, keep being curious and asking great questions! 📚";
+            }
+        }
+
+        // Allow Enter key to send message
+        document.getElementById('userInput')?.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
