@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatGPT Kids - Sign In</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23667eea' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' font-weight='bold' fill='white' text-anchor='middle'>C</text></svg>">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/index.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -66,7 +67,7 @@
         }
 
         p {
-            color: #666;
+            color: #03e625;
             text-align: center;
             margin-bottom: 30px;
             font-size: 14px;
@@ -187,7 +188,36 @@
         .forgot-password-link a:hover {
             text-decoration: underline;
         }
+
+        #reset-email-error,
+        #reset-email-success {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+            font-weight: 500;
+            display: none;
+        }
+
+        #reset-email-error {
+            color: #d32f2f;
+            background-color: #ffebee;
+        }
+
+        #reset-email-error.show {
+            display: block;
+        }
+
+        #reset-email-success {
+            color: #4caf50;
+            background-color: #e8f5e9;
+        }
+
+        #reset-email-success.show {
+            display: block;
+        }
     </style>
+</head>
 </head>
 <body>
     <div class="container">
@@ -316,6 +346,9 @@
     </div>
 
     <script>
+        // Initialize EmailJS with public key
+        emailjs.init("H2VCxKpJqB64W0aD3");
+        
         // Simulated user database (in real app, this would be backend)
         let users = JSON.parse(localStorage.getItem('chatgpt_kids_users')) || {};
         let currentUser = localStorage.getItem('chatgpt_kids_current_user') || null;
@@ -440,16 +473,26 @@
 
             localStorage.setItem('chatgpt_kids_users', JSON.stringify(users));
             
-            // Simulate sending verification email to parent
-            console.log(`Verification email sent to parent: ${parentEmail}`);
-            console.log(`Verification link: ${window.location.origin}${window.location.pathname}?verify=${verificationToken}`);
+            const verificationLink = window.location.origin + window.location.pathname + '?verify=' + verificationToken;
             
-            successDiv.innerHTML = `✅ Account created! A verification email has been sent to <strong>${parentEmail}</strong>.<br/>Please have your parent/guardian verify your account to continue.`;
-            successDiv.classList.add('show');
-
-            setTimeout(() => {
-                switchToSignIn();
-            }, 3000);
+            // Send verification email to parent/guardian
+            emailjs.send("service_dqwh6gi", "template_4u9m9zl", {
+                to_email: parentEmail,
+                child_name: username,
+                child_email: email,
+                verification_link: verificationLink
+            }).then(() => {
+                successDiv.innerHTML = `✅ Account created! A verification email has been sent to <strong>${parentEmail}</strong>.<br/>Please have your parent/guardian verify your account to continue.`;
+                successDiv.classList.add('show');
+                
+                setTimeout(() => {
+                    switchToSignIn();
+                }, 3000);
+            }).catch((error) => {
+                errorDiv.textContent = 'Error sending verification email. Please try again.';
+                errorDiv.classList.add('show');
+                console.error('EmailJS error:', error);
+            });
         }
 
         function handleForgotPassword(e) {
@@ -462,9 +505,11 @@
 
             // Check if email exists
             let userFound = false;
+            let foundUsername = null;
             for (let username in users) {
                 if (users[username].email === email) {
                     userFound = true;
+                    foundUsername = username;
                     break;
                 }
             }
@@ -475,16 +520,34 @@
                 return;
             }
 
-            // Simulate sending email
-            successDiv.textContent = `✅ Password reset link sent to ${email}. Check your inbox!`;
-            successDiv.classList.add('show');
+            // Generate password reset token
+            const resetToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
+            
+            // Store the reset token temporarily
+            users[foundUsername].resetToken = resetToken;
+            users[foundUsername].resetTokenExpiry = new Date(Date.now() + 30 * 60000).toISOString(); // 30 min expiry
+            localStorage.setItem('chatgpt_kids_users', JSON.stringify(users));
+            
+            const resetLink = window.location.origin + window.location.pathname + '?reset=' + resetToken;
+            
+            // Send password reset email
+            emailjs.send("service_dqwh6gi", "template_wd3cp5n", {
+                to_email: email,
+                username: foundUsername,
+                reset_link: resetLink
+            }).then(() => {
+                successDiv.textContent = `✅ Password reset link sent to ${email}. Check your inbox!`;
+                successDiv.classList.add('show');
 
-            // In a real app, you'd generate a token and send it via email
-            // For demo purposes, we'll show the reset form after 2 seconds
-            setTimeout(() => {
-                document.getElementById('forgotPasswordForm').classList.remove('active');
-                document.getElementById('resetPasswordForm').classList.add('active');
-            }, 2000);
+                setTimeout(() => {
+                    document.getElementById('forgotPasswordForm').classList.remove('active');
+                    document.getElementById('resetPasswordForm').classList.add('active');
+                }, 2000);
+            }).catch((error) => {
+                errorDiv.textContent = 'Error sending password reset email. Please try again.';
+                errorDiv.classList.add('show');
+                console.error('EmailJS error:', error);
+            });
         }
 
         function handleResetPassword(e) {
@@ -522,13 +585,14 @@
             document.querySelectorAll('.success').forEach(el => el.classList.remove('show'));
         }
 
-        // Check for verification token in URL (for parent/guardian verification link)
+        // Check for verification or reset token in URL
         window.addEventListener('load', function() {
             const urlParams = new URLSearchParams(window.location.search);
             const verifyToken = urlParams.get('verify');
+            const resetToken = urlParams.get('reset');
             
             if (verifyToken) {
-                // Find the user with this token
+                // Find the user with this verification token
                 for (let username in users) {
                     if (users[username].verificationToken === verifyToken) {
                         users[username].verified = true;
@@ -555,7 +619,102 @@
                     }
                 }
             }
+            
+            if (resetToken) {
+                // Find the user with this reset token
+                for (let username in users) {
+                    if (users[username].resetToken === resetToken) {
+                        // Check if token has expired
+                        const expiryTime = new Date(users[username].resetTokenExpiry);
+                        if (new Date() < expiryTime) {
+                            // Token is valid, store it temporarily and show reset form
+                            sessionStorage.setItem('resetUsername', username);
+                            sessionStorage.setItem('resetToken', resetToken);
+                            
+                            const container = document.querySelector('.container');
+                            container.innerHTML = `
+                                <div class="logo-header">
+                                    <div class="logo-icon">C</div>
+                                    <div class="logo-text">ChatGPT Kids</div>
+                                </div>
+                                <h1>Reset Your Password</h1>
+                                <p>Enter your new password below</p>
+                                <form onsubmit="handlePasswordResetFromEmail(event)">
+                                    <div class="form-group">
+                                        <label for="new-password">New Password</label>
+                                        <input type="password" id="new-password" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="confirm-password">Confirm Password</label>
+                                        <input type="password" id="confirm-password" required>
+                                    </div>
+                                    <button type="submit" class="button">Reset Password</button>
+                                    <div class="error" id="reset-email-error"></div>
+                                    <div class="success" id="reset-email-success"></div>
+                                </form>
+                            `;
+                            return;
+                        } else {
+                            // Token has expired
+                            const container = document.querySelector('.container');
+                            container.innerHTML = `
+                                <div class="logo-header">
+                                    <div class="logo-icon">C</div>
+                                    <div class="logo-text">ChatGPT Kids</div>
+                                </div>
+                                <h1 style="color: #d32f2f; text-align: center;">❌ Link Expired</h1>
+                                <p style="text-align: center; color: #333; margin: 20px 0;">
+                                    This password reset link has expired. Please request a new one.
+                                </p>
+                                <button class="button" onclick="window.location.href='signin.html'" style="margin-top: 30px; display: block; width: 100%;">Back to Sign In</button>
+                            `;
+                            return;
+                        }
+                    }
+                }
+            }
         });
+        
+        function handlePasswordResetFromEmail(e) {
+            e.preventDefault();
+            
+            const newPassword = document.getElementById('new-password').value;
+            const confirmPassword = document.getElementById('confirm-password').value;
+            const errorDiv = document.getElementById('reset-email-error');
+            const successDiv = document.getElementById('reset-email-success');
+            
+            const username = sessionStorage.getItem('resetUsername');
+            const resetToken = sessionStorage.getItem('resetToken');
+            
+            if (newPassword.length < 6) {
+                errorDiv.textContent = 'Password must be at least 6 characters long.';
+                errorDiv.classList.add('show');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                errorDiv.textContent = 'Passwords do not match.';
+                errorDiv.classList.add('show');
+                return;
+            }
+            
+            // Update password
+            if (users[username] && users[username].resetToken === resetToken) {
+                users[username].password = newPassword;
+                users[username].resetToken = null;
+                users[username].resetTokenExpiry = null;
+                localStorage.setItem('chatgpt_kids_users', JSON.stringify(users));
+                
+                successDiv.textContent = '✅ Password reset successfully! Redirecting...';
+                successDiv.classList.add('show');
+                
+                setTimeout(() => {
+                    sessionStorage.removeItem('resetUsername');
+                    sessionStorage.removeItem('resetToken');
+                    window.location.href = 'signin.html';
+                }, 2000);
+            }
+        }
     </script>
 </body>
 </html>
