@@ -345,8 +345,15 @@
     </div>
 
     <script>
-        // Initialize EmailJS with public key
-        emailjs.init("H2VCxKpJqB64W0aD3");
+        // Initialize EmailJS after page loads
+        window.addEventListener('load', function() {
+            if (typeof emailjs !== 'undefined') {
+                emailjs.init("H2VCxKpJqB64W0aD3");
+                console.log('EmailJS initialized successfully');
+            } else {
+                console.error('EmailJS library failed to load');
+            }
+        });
         
         // Simulated user database (in real app, this would be backend)
         let users = JSON.parse(localStorage.getItem('chatgpt_kids_users')) || {};
@@ -480,6 +487,12 @@
             const verificationLink = window.location.origin + window.location.pathname + '?verify=' + verificationToken;
             
             // Send verification email to parent/guardian
+            if (typeof emailjs === 'undefined') {
+                errorDiv.textContent = 'Email service is not available. Please try again later.';
+                errorDiv.classList.add('show');
+                return;
+            }
+            
             emailjs.send("service_dqwh6gi", "template_4u9m9zl", {
                 to_email: parentEmail,
                 child_name: username,
@@ -535,6 +548,12 @@
             const resetLink = window.location.origin + window.location.pathname + '?reset=' + resetToken;
             
             // Send password reset email
+            if (typeof emailjs === 'undefined') {
+                errorDiv.textContent = 'Email service is not available. Please try again later.';
+                errorDiv.classList.add('show');
+                return;
+            }
+            
             emailjs.send("service_dqwh6gi", "template_wd3cp5n", {
                 to_email: email,
                 username: foundUsername,
