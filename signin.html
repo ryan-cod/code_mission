@@ -353,10 +353,12 @@
         let currentUser = localStorage.getItem('chatgpt_kids_current_user') || null;
 
         function switchToSignUp() {
+            console.log('switchToSignUp called');
             document.getElementById('signInForm').classList.remove('active');
             document.getElementById('signUpForm').classList.add('active');
             document.getElementById('ageStep').classList.add('active');
             document.getElementById('accountStep').classList.remove('active');
+            console.log('Switched to sign up form');
         }
 
         function switchToSignIn() {
@@ -373,12 +375,15 @@
         }
 
         function selectAge(isKid) {
+            console.log('selectAge called with:', isKid);
             if (isKid) {
                 document.getElementById('ageStep').classList.remove('active');
                 document.getElementById('accountStep').classList.add('active');
+                console.log('Switched to account step');
             } else {
                 document.getElementById('ageStep').classList.remove('active');
                 document.getElementById('adultStep').classList.add('active');
+                console.log('Switched to adult step');
             }
         }
 
