@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Somer.O - AI Coding Assistant</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23667eea' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' font-weight='bold' fill='white' text-anchor='middle'>S</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 900px;
+            height: 85vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: bold;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .logo {
+            width: 50px;
+            height: 50px;
+            background: white;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 28px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-text {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .header-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+
+        .header-subtitle {
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0.9;
+        }
+
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .message {
+            padding: 16px 20px;
+            border-radius: 12px;
+            max-width: 85%;
+            word-wrap: break-word;
+            line-height: 1.6;
+            font-size: 15px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .message.user {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.bot {
+            background: #f8f9fa;
+            color: #2c3e50;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+            border: 1px solid #e9ecef;
+        }
+
+        .message.bot pre {
+            background: #2c3e50;
+            color: #ecf0f1;
+            padding: 12px;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin: 10px 0;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .message.bot code {
+            background: #34495e;
+            color: #ecf0f1;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+            font-size: 13px;
+        }
+
+        .input-area {
+            padding: 20px;
+            border-top: 1px solid #e9ecef;
+            background: white;
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+        }
+
+        .input-area textarea {
+            flex: 1;
+            padding: 14px 16px;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            font-size: 15px;
+            font-family: inherit;
+            outline: none;
+            resize: none;
+            min-height: 20px;
+            max-height: 120px;
+            transition: border-color 0.3s;
+        }
+
+        .input-area textarea:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .input-area button {
+            padding: 14px 24px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 15px;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .input-area button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .input-area button:active {
+            transform: translateY(0);
+        }
+
+        .typing {
+            display: none;
+            padding: 12px 16px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            color: #6c757d;
+            font-style: italic;
+            align-self: flex-start;
+            border: 1px solid #e9ecef;
+        }
+
+        .typing.active {
+            display: block;
+        }
+
+        .language-selector {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .language-selector select {
+            border: none;
+            background: transparent;
+            font-weight: 600;
+            color: #667eea;
+            cursor: pointer;
+            outline: none;
+        }
+
+        .welcome-message {
+            text-align: center;
+            padding: 40px 20px;
+            color: #6c757d;
+        }
+
+        .welcome-message h2 {
+            color: #2c3e50;
+            margin-bottom: 16px;
+            font-size: 24px;
+        }
+
+        .welcome-message p {
+            font-size: 16px;
+            line-height: 1.6;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .code-examples {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 24px;
+        }
+
+        .code-example {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .code-example:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                height: 95vh;
+                margin: 10px;
+            }
+
+            .header {
+                padding: 16px;
+                font-size: 24px;
+            }
+
+            .message {
+                max-width: 95%;
+                font-size: 14px;
+            }
+
+            .input-area {
+                padding: 16px;
+            }
+
+            .input-area button {
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">S</div>
+            <div class="header-text">
+                <div class="header-title">Somer.O</div>
+                <div class="header-subtitle">AI Coding Assistant</div>
+            </div>
+            <div class="language-selector">
+                <select id="languageSelect">
+                    <option value="javascript">JavaScript</option>
+                    <option value="python">Python</option>
+                    <option value="java">Java</option>
+                    <option value="cpp">C++</option>
+                    <option value="csharp">C#</option>
+                    <option value="php">PHP</option>
+                    <option value="ruby">Ruby</option>
+                    <option value="go">Go</option>
+                    <option value="rust">Rust</option>
+                    <option value="typescript">TypeScript</option>
+                    <option value="html">HTML/CSS</option>
+                    <option value="sql">SQL</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="chat-area">
+            <div class="messages" id="messages">
+                <div class="welcome-message">
+                    <h2>👋 Welcome to Somer.O!</h2>
+                    <p>I'm your AI coding assistant. I can help you write, debug, explain, and optimize code in multiple programming languages. Ask me anything about programming!</p>
+                    <div class="code-examples">
+                        <button class="code-example" onclick="sendExample('Write a function to reverse a string in JavaScript')">Reverse String</button>
+                        <button class="code-example" onclick="sendExample('Create a Python class for a simple calculator')">Python Calculator</button>
+                        <button class="code-example" onclick="sendExample('Explain how recursion works with a factorial example')">Recursion Explained</button>
+                        <button class="code-example" onclick="sendExample('Optimize this SQL query for better performance')">SQL Optimization</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="typing" id="typing">Somer.O is thinking...</div>
+
+            <div class="input-area">
+                <textarea
+                    id="userInput"
+                    placeholder="Ask me about code, algorithms, debugging, or any programming question..."
+                    rows="1"
+                ></textarea>
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const messagesContainer = document.getElementById('messages');
+        const userInput = document.getElementById('userInput');
+        const typingIndicator = document.getElementById('typing');
+        const languageSelect = document.getElementById('languageSelect');
+
+        // Auto-resize textarea
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+        });
+
+        // Send message on Enter (but allow Shift+Enter for new lines)
+        userInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        function sendExample(example) {
+            userInput.value = example;
+            userInput.style.height = 'auto';
+            userInput.style.height = userInput.scrollHeight + 'px';
+            sendMessage();
+        }
+
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // Add user message
+            addMessage(message, 'user');
+
+            // Clear input
+            userInput.value = '';
+            userInput.style.height = 'auto';
+
+            // Show typing indicator
+            typingIndicator.classList.add('active');
+
+            // Scroll to bottom
+            scrollToBottom();
+
+            // Generate response after delay
+            setTimeout(() => {
+                typingIndicator.classList.remove('active');
+                const response = generateCodingResponse(message);
+                addMessage(response, 'bot');
+                scrollToBottom();
+            }, 1000 + Math.random() * 2000); // Random delay between 1-3 seconds
+        }
+
+        function addMessage(content, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            if (type === 'bot') {
+                messageDiv.innerHTML = formatCodeBlocks(content);
+            } else {
+                messageDiv.textContent = content;
+            }
+
+            messagesContainer.appendChild(messageDiv);
+        }
+
+        function formatCodeBlocks(text) {
+            // Format inline code
+            text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+            // Format code blocks
+            text = text.replace(/```(\w+)?\n?([\s\S]*?)```/g, function(match, lang, code) {
+                return `<pre><code class="language-${lang || ''}">${escapeHtml(code.trim())}</code></pre>`;
+            });
+
+            return text;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function scrollToBottom() {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+        }
+
+        function generateCodingResponse(userMessage) {
+            const lowerMessage = userMessage.toLowerCase();
+            const selectedLanguage = languageSelect.value;
+
+            // Code generation requests
+            if (lowerMessage.includes('write') || lowerMessage.includes('create') || lowerMessage.includes('make')) {
+                return generateCodeExample(userMessage, selectedLanguage);
+            }
+
+            // Explanation requests
+            if (lowerMessage.includes('explain') || lowerMessage.includes('how') || lowerMessage.includes('what is')) {
+                return generateExplanation(userMessage, selectedLanguage);
+            }
+
+            // Debugging requests
+            if (lowerMessage.includes('debug') || lowerMessage.includes('fix') || lowerMessage.includes('error')) {
+                return generateDebugHelp(userMessage, selectedLanguage);
+            }
+
+            // Algorithm requests
+            if (lowerMessage.includes('algorithm') || lowerMessage.includes('sort') || lowerMessage.includes('search')) {
+                return generateAlgorithmExample(userMessage, selectedLanguage);
+            }
+
+            // Optimization requests
+            if (lowerMessage.includes('optimize') || lowerMessage.includes('performance') || lowerMessage.includes('faster')) {
+                return generateOptimizationTips(userMessage, selectedLanguage);
+            }
+
+            // Default response
+            return generateDefaultResponse(userMessage, selectedLanguage);
+        }
+
+        function generateCodeExample(message, language) {
+            const examples = {
+                javascript: {
+                    reverse: `function reverseString(str) {
+    return str.split('').reverse().join('');
+}
+
+// Example usage:
+console.log(reverseString("Hello World")); // "dlroW olleH"
+
+// Alternative using modern syntax:
+const reverseString = str => [...str].reverse().join('');`,
+
+                    calculator: `class Calculator {
+    constructor() {
+        this.result = 0;
+    }
+
+    add(num) {
+        this.result += num;
+        return this;
+    }
+
+    subtract(num) {
+        this.result -= num;
+        return this;
+    }
+
+    multiply(num) {
+        this.result *= num;
+        return this;
+    }
+
+    divide(num) {
+        if (num !== 0) {
+            this.result /= num;
+        }
+        return this;
+    }
+
+    getResult() {
+        return this.result;
+    }
+
+    clear() {
+        this.result = 0;
+        return this;
+    }
+}
+
+// Usage:
+const calc = new Calculator();
+const result = calc.add(5).multiply(3).subtract(2).getResult();
+console.log(result); // 13`
+                },
+
+                python: {
+                    calculator: `class Calculator:
+    def __init__(self):
+        self.result = 0
+
+    def add(self, num):
+        self.result += num
+        return self
+
+    def subtract(self, num):
+        self.result -= num
+        return self
+
+    def multiply(self, num):
+        self.result *= num
+        return self
+
+    def divide(self, num):
+        if num != 0:
+            self.result /= num
+        return self
+
+    def get_result(self):
+        return self.result
+
+    def clear(self):
+        self.result = 0
+        return self
+
+# Usage:
+calc = Calculator()
+result = calc.add(5).multiply(3).subtract(2).get_result()
+print(result)  # 13`
+                }
+            };
+
+            if (examples[language] && message.toLowerCase().includes('reverse')) {
+                return `Here's a string reversal function in ${language}:\n\n` + '```' + language + '\n' + examples[language].reverse + '\n```';
+            }
+
+            if (examples[language] && message.toLowerCase().includes('calculator')) {
+                return `Here's a calculator class in ${language}:\n\n` + '```' + language + '\n' + examples[language].calculator + '\n```';
+            }
+
+            return `I can help you write code in ${language}! Could you be more specific about what you want to create? For example:\n\n• A function to solve a specific problem\n• A class with certain functionality\n• An algorithm implementation\n• A utility script`;
+        }
+
+        function generateExplanation(message, language) {
+            if (message.toLowerCase().includes('recursion')) {
+                return `**Recursion** is a programming technique where a function calls itself to solve a problem. Here's how it works with a factorial example:
+
+**What is factorial?**
+- 5! = 5 × 4 × 3 × 2 × 1 = 120
+- n! = n × (n-1) × (n-2) × ... × 1
+
+**Recursive implementation:**
+\`\`\`${language}
+function factorial(n) {
+    // Base case: factorial of 0 or 1 is 1
+    if (n <= 1) {
+        return 1;
+    }
+    // Recursive case: n! = n × (n-1)!
+    return n * factorial(n - 1);
+}
+
+console.log(factorial(5)); // 120
+\`\`\`
+
+**How it works:**
+1. factorial(5) calls factorial(4)
+2. factorial(4) calls factorial(3)
+3. factorial(3) calls factorial(2)
+4. factorial(2) calls factorial(1)
+5. factorial(1) returns 1 (base case)
+6. Results multiply back up: 2×1=2, 3×2=6, 4×6=24, 5×24=120
+
+**Key points:**
+- Every recursive function needs a **base case** to stop
+- Each call should get closer to the base case
+- Recursion can be less efficient than iteration due to function call overhead`;
+            }
+
+            return `I'd be happy to explain that concept! Could you be more specific about what you'd like me to explain? For example:\n\n• A specific programming concept\n• How a particular algorithm works\n• Syntax or features of ${language}\n• Best practices or design patterns`;
+        }
+
+        function generateDebugHelp(message, language) {
+            return `**Debugging Tips for ${language}:**
+
+1. **Check your console/logs** - Add logging statements to track variable values
+2. **Use breakpoints** - Set breakpoints in your IDE/debugger
+3. **Isolate the problem** - Test small parts of your code individually
+4. **Check for common issues:**
+   - Variable scope problems
+   - Type mismatches
+   - Null/undefined values
+   - Infinite loops
+   - Syntax errors
+
+**Example debugging approach:**
+\`\`\`${language}
+// Add logging to track execution
+console.log('Starting function with input:', inputValue);
+
+try {
+    // Your code here
+    const result = someFunction(inputValue);
+    console.log('Function result:', result);
+    return result;
+} catch (error) {
+    console.error('Error occurred:', error);
+    throw error;
+}
+\`\`\`
+
+Could you share the specific error message or problematic code you'd like help debugging?`;
+        }
+
+        function generateAlgorithmExample(message, language) {
+            if (message.toLowerCase().includes('sort')) {
+                return `**Sorting Algorithms in ${language}:**
+
+**1. Bubble Sort (Simple but slow):**
+\`\`\`${language}
+function bubbleSort(arr) {
+    for (let i = 0; i < arr.length; i++) {
+        for (let j = 0; j < arr.length - i - 1; j++) {
+            if (arr[j] > arr[j + 1]) {
+                [arr[j], arr[j + 1]] = [arr[j + 1], arr[j]];
+            }
+        }
+    }
+    return arr;
+}
+\`\`\`
+
+**2. Quick Sort (Fast and efficient):**
+\`\`\`${language}
+function quickSort(arr) {
+    if (arr.length <= 1) return arr;
+
+    const pivot = arr[arr.length - 1];
+    const left = [];
+    const right = [];
+
+    for (let i = 0; i < arr.length - 1; i++) {
+        if (arr[i] < pivot) {
+            left.push(arr[i]);
+        } else {
+            right.push(arr[i]);
+        }
+    }
+
+    return [...quickSort(left), pivot, ...quickSort(right)];
+}
+\`\`\`
+
+**Time Complexities:**
+- Bubble Sort: O(n²) - Good for small arrays
+- Quick Sort: O(n log n) - Good for most cases
+
+Would you like me to explain a different algorithm or show implementations in other languages?`;
+            }
+
+            return `I can help with various algorithms! What specific algorithm are you interested in?\n\n• **Sorting**: Bubble, Quick, Merge, Insertion\n• **Searching**: Binary Search, Linear Search\n• **Data Structures**: Stacks, Queues, Trees, Graphs\n• **Dynamic Programming**: Fibonacci, Knapsack, etc.\n\nJust let me know which one you'd like to explore!`;
+        }
+
+        function generateOptimizationTips(message, language) {
+            return `**Performance Optimization Tips for ${language}:**
+
+**1. Algorithm Complexity:**
+- Choose O(n log n) over O(n²) algorithms when possible
+- Use appropriate data structures (HashMap for O(1) lookups)
+
+**2. Memory Management:**
+- Avoid creating unnecessary objects in loops
+- Use primitive types when possible
+- Clear references to large objects when done
+
+**3. Code-level Optimizations:**
+\`\`\`${language}
+// ❌ Inefficient
+for (let i = 0; i < array.length; i++) {
+    if (array[i] > 10) {
+        // do something
+    }
+}
+
+// ✅ More efficient (cache length)
+const len = array.length;
+for (let i = 0; i < len; i++) {
+    if (array[i] > 10) {
+        // do something
+    }
+}
+\`\`\`
+
+**4. ${language}-specific optimizations:**
+${getLanguageSpecificTips(language)}
+
+**5. Profiling:**
+- Use browser dev tools for JavaScript
+- Use \`time\` command for CLI apps
+- Profile memory usage and identify bottlenecks
+
+What specific code or functionality are you trying to optimize?`;
+        }
+
+        function getLanguageSpecificTips(language) {
+            const tips = {
+                javascript: `- Use \`const\` and \`let\` instead of \`var\`\n- Prefer arrow functions for callbacks\n- Use \`Map\` and \`Set\` for better performance\n- Avoid deep object cloning when possible`,
+                python: `- Use list comprehensions over loops when possible\n- Prefer built-in functions over custom implementations\n- Use generators for large datasets\n- Profile with \`cProfile\` module`,
+                java: `- Use StringBuilder for string concatenation\n- Prefer primitive types over wrapper classes\n- Use enhanced for-loops when possible\n- Consider lazy initialization`
+            };
+            return tips[language] || '- Follow language-specific best practices\n- Use appropriate libraries\n- Profile and measure performance';
+        }
+
+        function generateDefaultResponse(message, language) {
+            return `I'm here to help with your coding questions! I can assist with:
+
+**🛠️ Code Help:**
+• Writing functions, classes, and algorithms
+• Debugging and fixing errors
+• Code optimization and performance
+
+**📚 Learning:**
+• Explaining programming concepts
+• Best practices and design patterns
+• Language-specific features
+
+**🔧 Tools & Techniques:**
+• Version control (Git)
+• Testing and debugging strategies
+• Development workflows
+
+**Current language:** ${language}
+
+What would you like to work on? Feel free to ask me anything about programming!`;
+        }
+
+        // Initialize
+        scrollToBottom();
+    </script>
+</body>
+</html>
