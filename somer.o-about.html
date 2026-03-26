@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Somer.O - AI Coding Assistant</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23667eea' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' font-weight='bold' fill='white' text-anchor='middle'>S</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f7fa;
+            color: #2c3e50;
+            line-height: 1.6;
+        }
+
+        header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 60px 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .header-content {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 56px;
+            font-weight: bold;
+            margin: 0 auto 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 48px;
+            margin-bottom: 16px;
+            font-weight: 700;
+        }
+
+        .tagline {
+            font-size: 20px;
+            opacity: 0.95;
+            margin-bottom: 30px;
+        }
+
+        .cta-button {
+            display: inline-block;
+            padding: 14px 32px;
+            background: white;
+            color: #667eea;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        section {
+            background: white;
+            margin: 40px auto;
+            padding: 50px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        section h2 {
+            font-size: 36px;
+            margin-bottom: 24px;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 12px;
+        }
+
+        section h3 {
+            font-size: 24px;
+            margin-top: 30px;
+            margin-bottom: 16px;
+            color: #2c3e50;
+        }
+
+        section p {
+            margin-bottom: 16px;
+            font-size: 16px;
+            line-height: 1.8;
+            color: #495057;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 32px;
+            margin-bottom: 12px;
+        }
+
+        .feature-card h4 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: #2c3e50;
+        }
+
+        .feature-card p {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+
+        .languages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+
+        .language-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 16px;
+            border-radius: 8px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+
+        .capabilities-list {
+            list-style: none;
+            margin: 25px 0;
+        }
+
+        .capabilities-list li {
+            padding: 12px 0 12px 40px;
+            position: relative;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .capabilities-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #28a745;
+            font-weight: bold;
+            font-size: 20px;
+        }
+
+        .comparison-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        .comparison-table th {
+            background: #667eea;
+            color: white;
+            padding: 16px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 16px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .comparison-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+
+        .comparison-table tr:hover {
+            background: #f0f0ff;
+        }
+
+        .check {
+            color: #28a745;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .x {
+            color: #dc3545;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .use-cases {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
+            margin: 30px 0;
+        }
+
+        .use-case-card {
+            background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+            padding: 30px;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s;
+        }
+
+        .use-case-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+        }
+
+        .use-case-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+        }
+
+        .use-case-card h4 {
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: #2c3e50;
+        }
+
+        .use-case-card p {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .testimonial {
+            background: #f0f4ff;
+            border-left: 4px solid #667eea;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 8px;
+            font-style: italic;
+            color: #495057;
+        }
+
+        .testimonial:before {
+            content: '"';
+            font-size: 48px;
+            color: #667eea;
+            opacity: 0.3;
+            line-height: 1;
+        }
+
+        .faq {
+            margin: 25px 0;
+        }
+
+        .faq-item {
+            background: #f8f9fa;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .faq-item:hover {
+            background: #f0f0ff;
+            border-left: 4px solid #667eea;
+        }
+
+        .faq-question {
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .faq-answer {
+            color: #6c757d;
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .stat {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-number {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            opacity: 0.95;
+        }
+
+        footer {
+            background: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 30px 20px;
+            margin-top: 60px;
+        }
+
+        footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .nav {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav .container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 20px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #495057;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: #667eea;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 32px;
+            }
+
+            section {
+                padding: 30px 20px;
+            }
+
+            section h2 {
+                font-size: 28px;
+            }
+
+            .comparison-table {
+                font-size: 14px;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 12px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .features-grid,
+            .languages-grid,
+            .use-cases,
+            .stats {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="nav">
+        <div class="container">
+            <div class="nav-logo">S • Somer.O</div>
+            <ul class="nav-links">
+                <li><a href="#features">Features</a></li>
+                <li><a href="#languages">Languages</a></li>
+                <li><a href="#use-cases">Use Cases</a></li>
+                <li><a href="#faq">FAQ</a></li>
+                <li><a href="somer.o.html">Try It Now</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <header>
+        <div class="header-content">
+            <div class="logo">S</div>
+            <h1>Somer.O</h1>
+            <p class="tagline">Your AI Coding Assistant - Powered by Intelligent Code Generation & Learning</p>
+            <a href="somer.o.html" class="cta-button">🚀 Launch Somer.O</a>
+        </div>
+    </header>
+
+    <div class="container">
+        <section id="about">
+            <h2>What is Somer.O?</h2>
+            <p>
+                <strong>Somer.O</strong> is an advanced AI coding assistant designed to help programmers of all skill levels write, debug, explain, and optimize code. Whether you're a beginner learning your first programming language or an experienced developer looking to write cleaner code, Somer.O is your intelligent companion.
+            </p>
+            <p>
+                Built with modern web technologies and leveraging sophisticated pattern matching and code analysis, Somer.O provides instant, context-aware assistance for your coding challenges. It's available 24/7, works across multiple programming languages, and requires no setup or installation.
+            </p>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-number">12+</div>
+                    <div class="stat-label">Languages</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">5</div>
+                    <div class="stat-label">Core Features</div>
+                </div>
+                <div class="stat">
+                    <div class="stat-number">∞</div>
+                    <div class="stat-label">Use Cases</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features">
+            <h2>Key Features</h2>
+            <div class="features-grid">
+                <div class="feature-card">
+                    <div class="feature-icon">💻</div>
+                    <h4>Code Generation</h4>
+                    <p>Write functions, classes, algorithms, and complete scripts. Just describe what you need and Somer.O generates working code examples.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🐛</div>
+                    <h4>Debugging Help</h4>
+                    <p>Share your error messages and problematic code. Get step-by-step debugging strategies and solutions to fix issues quickly.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">📚</div>
+                    <h4>Explanations</h4>
+                    <p>Understand complex concepts, algorithms, and syntax. Somer.O breaks down programming concepts into easy-to-understand explanations.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚡</div>
+                    <h4>Optimization Tips</h4>
+                    <p>Improve code performance. Get recommendations for algorithm selection, memory management, and language-specific optimizations.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">🔄</div>
+                    <h4>Multi-Language Support</h4>
+                    <p>Work with your language of choice. Somer.O supports 12+ programming languages with context-aware responses.</p>
+                </div>
+                <div class="feature-card">
+                    <div class="feature-icon">⚙️</div>
+                    <h4>Real-time Chat</h4>
+                    <p>Interactive conversation-based interface. Ask follow-up questions and refine your code iteratively.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="languages">
+            <h2>Supported Programming Languages</h2>
+            <p>Somer.O works with a wide variety of programming languages. Select your language of choice to get language-specific help and examples:</p>
+            <div class="languages-grid">
+                <div class="language-badge">JavaScript</div>
+                <div class="language-badge">Python</div>
+                <div class="language-badge">Java</div>
+                <div class="language-badge">C++</div>
+                <div class="language-badge">C#</div>
+                <div class="language-badge">PHP</div>
+                <div class="language-badge">Ruby</div>
+                <div class="language-badge">Go</div>
+                <div class="language-badge">Rust</div>
+                <div class="language-badge">TypeScript</div>
+                <div class="language-badge">HTML/CSS</div>
+                <div class="language-badge">SQL</div>
+            </div>
+        </section>
+
+        <section id="capabilities">
+            <h2>What You Can Do</h2>
+            <h3>Write Code</h3>
+            <ul class="capabilities-list">
+                <li>Generate functions and classes with complete implementations</li>
+                <li>Create algorithms and data structure implementations</li>
+                <li>Build utility scripts and helper functions</li>
+                <li>Write boilerplate code and project scaffolding</li>
+                <li>Generate test cases and sample data</li>
+            </ul>
+
+            <h3>Debug & Fix Issues</h3>
+            <ul class="capabilities-list">
+                <li>Share error messages and get solutions</li>
+                <li>Identify common bugs and pitfalls</li>
+                <li>Get step-by-step debugging strategies</li>
+                <li>Learn from mistakes and improve code quality</li>
+                <li>Prevent future errors with best practices</li>
+            </ul>
+
+            <h3>Learn & Understand</h3>
+            <ul class="capabilities-list">
+                <li>Understand complex programming concepts</li>
+                <li>Learn how algorithms work with examples</li>
+                <li>Explore language features and syntax</li>
+                <li>Discover best practices and design patterns</li>
+                <li>Improve your coding skills systematically</li>
+            </ul>
+
+            <h3>Optimize & Improve</h3>
+            <ul class="capabilities-list">
+                <li>Analyze code for performance improvements</li>
+                <li>Optimize algorithms for speed and memory</li>
+                <li>Refactor code for readability and maintainability</li>
+                <li>Get recommendations for data structures</li>
+                <li>Learn language-specific optimization techniques</li>
+            </ul>
+        </section>
+
+        <section id="use-cases">
+            <h2>Perfect For</h2>
+            <div class="use-cases">
+                <div class="use-case-card">
+                    <div class="use-case-icon">🎓</div>
+                    <h4>Students</h4>
+                    <p>Learning to code? Get explanations, examples, and help understanding assignments without just doing them for you.</p>
+                </div>
+                <div class="use-case-card">
+                    <div class="use-case-icon">💼</div>
+                    <h4>Professionals</h4>
+                    <p>Speed up development, solve problems faster, and write better code. A coding partner that's always available.</p>
+                </div>
+                <div class="use-case-card">
+                    <div class="use-case-icon">🔄</div>
+                    <h4>Career Switchers</h4>
+                    <p>Transitioning into tech? Learn new languages and concepts with patient, detailed explanations.</p>
+                </div>
+                <div class="use-case-card">
+                    <div class="use-case-icon">🚀</div>
+                    <h4>Developers</h4>
+                    <p>Work with unfamiliar languages or frameworks. Get quick solutions and learn by example.</p>
+                </div>
+                <div class="use-case-card">
+                    <div class="use-case-icon">🎯</div>
+                    <h4>Problem Solvers</h4>
+                    <p>Working through complex algorithms? Get help understanding, implementing, and optimizing solutions.</p>
+                </div>
+                <div class="use-case-card">
+                    <div class="use-case-icon">🧠</div>
+                    <h4>Lifelong Learners</h4>
+                    <p>Continuously improve your skills. Explore new languages, patterns, and best practices.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="comparison">
+            <h2>How Somer.O Compares</h2>
+            <table class="comparison-table">
+                <thead>
+                    <tr>
+                        <th>Feature</th>
+                        <th>Somer.O</th>
+                        <th>Search Engines</th>
+                        <th>ChatGPT</th>
+                        <th>Stack Overflow</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Code Generation</strong></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="x">✗</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="x">✗</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Interactive Chat</strong></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="x">✗</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="x">✗</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Multi-Language</strong></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Always Available</strong></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>No Setup Required</strong></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Focused on Learning</strong></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="x">✗</span></td>
+                        <td><span class="check">✓</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Community Driven</strong></td>
+                        <td><span class="x">✗</span></td>
+                        <td><span class="x">✗</span></td>
+                        <td><span class="x">✗</span></td>
+                        <td><span class="check">✓</span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <section id="faq">
+            <h2>Frequently Asked Questions</h2>
+            <div class="faq">
+                <div class="faq-item">
+                    <div class="faq-question">❓ Is Somer.O free to use?</div>
+                    <div class="faq-answer">Yes! Somer.O is completely free. No registration, no subscriptions, no limits. Just visit the site and start coding.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">❓ Do I need to install anything?</div>
+                    <div class="faq-answer">No setup needed! Somer.O runs entirely in your browser. Just visit the website and start chatting.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">❓ Will Somer.O do my homework/assignment?</div>
+                    <div class="faq-answer">Somer.O is designed to help you learn, not to do the work for you. It provides explanations, guidance, and examples to help you understand and solve problems yourself.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">❓ What if I need help with a language not listed?</div>
+                    <div class="faq-answer">While Somer.O is optimized for the listed languages, it can still help with others! Try asking and see what assistance it can provide.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">❓ How accurate is Somer.O?</div>
+                    <div class="faq-answer">Somer.O uses pattern matching and knowledge databases to provide helpful responses. Always test generated code and verify solutions for your specific use case.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">❓ Can I use code generated by Somer.O in my projects?</div>
+                    <div class="faq-answer">Yes! You can use any code generated by Somer.O in your personal or commercial projects. It's yours to use and modify.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">❓ Is my chat history saved?</div>
+                    <div class="faq-answer">Your conversation happens in your browser and is not saved to our servers. Close the page and start fresh each time.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-question">❓ Can I use Somer.O on mobile?</div>
+                    <div class="faq-answer">Absolutely! Somer.O works on phones, tablets, and computers. The interface is responsive and works great on any screen size.</div>
+                </div>
+            </div>
+        </section>
+
+        <section>
+            <h2>Get Started</h2>
+            <p style="font-size: 18px; margin-bottom: 30px;">
+                Ready to level up your coding? Launch Somer.O now and start getting instant help with your programming questions.
+            </p>
+            <div style="text-align: center;">
+                <a href="somer.o.html" class="cta-button" style="font-size: 18px; padding: 16px 40px;">
+                    🚀 Launch Somer.O Now
+                </a>
+            </div>
+            <p style="text-align: center; margin-top: 20px; color: #6c757d;">
+                No account needed. No signup. Just start chatting with your AI coding assistant.
+            </p>
+        </section>
+    </div>
+
+    <footer>
+        <div class="container">
+            <p style="margin-bottom: 10px;">
+                <strong>Somer.O</strong> - AI Coding Assistant
+            </p>
+            <p>
+                <a href="index.html">Home</a> • 
+                <a href="somer.o.html">Try Somer.O</a> • 
+                <a href="somer.ocheck.html">Status</a>
+            </p>
+            <p style="margin-top: 20px; opacity: 0.7;">
+                © 2026 Somer.O. Built with ❤️ for developers everywhere.
+            </p>
+        </div>
+    </footer>
+</body>
+</html>
