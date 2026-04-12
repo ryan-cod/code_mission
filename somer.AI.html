@@ -265,21 +265,132 @@
             font-weight: 500;
         }
 
-        @media (max-width: 768px) {
-            .container {
-                flex-direction: column;
-            }
+        .audio-controls {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+        }
 
-            .sidebar {
-                width: 100%;
-                height: 200px;
-                border-right: none;
-                border-bottom: 1px solid #e9ecef;
-            }
+        .audio-button {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
 
-            .canvas-area {
-                height: calc(100vh - 200px);
+        .audio-button:hover {
+            transform: scale(1.1);
+        }
+
+        .audio-button.active {
+            background: #22c55e !important;
+            color: white;
+        }
+
+        .audio-button.recording {
+            background: #ef4444 !important;
+            color: white;
+            animation: pulse-red 1s infinite;
+        }
+
+        @keyframes pulse-red {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .audio-visualizer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 200px;
+            height: 60px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            backdrop-filter: blur(10px);
+        }
+
+        .visualizer-bars {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            height: 40px;
+            gap: 2px;
+        }
+
+        .bar {
+            width: 4px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 2px;
+            transition: height 0.1s;
+        }
+
+        .voice-wave {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(102, 126, 234, 0.3);
+            pointer-events: none;
+            animation: voice-wave 2s infinite;
+        }
+
+        @keyframes voice-wave {
+            0% {
+                transform: scale(1);
+                opacity: 0.7;
             }
+            100% {
+                transform: scale(2);
+                opacity: 0;
+            }
+        }
+
+        .speech-bubble {
+            position: absolute;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            padding: 15px;
+            max-width: 300px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s;
+            pointer-events: auto;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .speech-bubble.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 30px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid #667eea;
         }
     </style>
 </head>
@@ -324,6 +435,39 @@
                 <canvas id="mainCanvas"></canvas>
                 <div class="ai-brain"></div>
                 <div class="floating-elements" id="floatingElements"></div>
+
+                <!-- Audio Controls -->
+                <div class="audio-controls" id="audioControls">
+                    <button class="audio-button" id="micButton" title="Voice Input">🎤</button>
+                    <button class="audio-button" id="speakButton" title="Text-to-Speech">🔊</button>
+                    <button class="audio-button" id="musicButton" title="AI Music">🎵</button>
+                </div>
+
+                <!-- Audio Visualizer -->
+                <div class="audio-visualizer" id="audioVisualizer">
+                    <div class="visualizer-bars" id="visualizerBars">
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                </div>
             </div>
 
             <div class="status-bar">
@@ -361,6 +505,283 @@
             "Imagination is the ultimate reality"
         ];
 
+        // Audio AI variables
+        let recognition = null;
+        let speechSynthesis = window.speechSynthesis;
+        let isListening = false;
+        let isSpeaking = false;
+        let audioContext = null;
+        let analyser = null;
+        let microphone = null;
+        let animationFrame = null;
+        let voiceWaves = [];
+        let speechBubbles = [];
+
+        // Initialize audio context
+        function initAudio() {
+            try {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 256;
+            } catch (e) {
+                console.log('Audio context not supported');
+            }
+        }
+
+        // Speech Recognition
+        function initSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.continuous = false;
+                recognition.interimResults = false;
+                recognition.lang = 'en-US';
+
+                recognition.onstart = function() {
+                    isListening = true;
+                    document.getElementById('micButton').classList.add('recording');
+                    statusText.textContent = '🎤 Listening... Speak your command!';
+                    createVoiceWave();
+                };
+
+                recognition.onresult = function(event) {
+                    const transcript = event.results[0][0].transcript;
+                    handleVoiceCommand(transcript);
+                };
+
+                recognition.onend = function() {
+                    isListening = false;
+                    document.getElementById('micButton').classList.remove('recording');
+                    statusText.textContent = 'Voice command processed!';
+                    removeVoiceWaves();
+                };
+
+                recognition.onerror = function(event) {
+                    console.error('Speech recognition error:', event.error);
+                    statusText.textContent = 'Voice recognition error. Try again.';
+                };
+            } else {
+                alert('Speech recognition not supported in this browser.');
+            }
+        }
+
+        // Voice command handler
+        function handleVoiceCommand(command) {
+            const lowerCommand = command.toLowerCase();
+            createSpeechBubble(command, 'user');
+
+            // Voice commands
+            if (lowerCommand.includes('mind map') || lowerCommand.includes('mindmap')) {
+                activateTool('mindmap');
+                speakResponse('Opening mind map creator. Start drawing your thoughts!');
+            } else if (lowerCommand.includes('story') || lowerCommand.includes('tell me a story')) {
+                activateTool('story');
+                speakResponse('Story weaver activated. What kind of story shall we create together?');
+            } else if (lowerCommand.includes('draw') || lowerCommand.includes('art')) {
+                activateTool('art');
+                speakResponse('Digital artist mode activated. Draw your vision on the canvas!');
+            } else if (lowerCommand.includes('music') || lowerCommand.includes('play music')) {
+                activateTool('music');
+                speakResponse('Music composer ready. What mood should our composition have?');
+            } else if (lowerCommand.includes('logic') || lowerCommand.includes('logic visualizer')) {
+                activateTool('logic');
+                speakResponse('Logic visualizer activated. Let\'s map out your reasoning!');
+            } else if (lowerCommand.includes('dream') || lowerCommand.includes('dream interpreter')) {
+                activateTool('dream');
+                speakResponse('Dream interpreter ready. Share your dream with me.');
+            } else if (lowerCommand.includes('future') || lowerCommand.includes('predict')) {
+                activateTool('future');
+                speakResponse('Future predictor activated. What future interests you?');
+            } else if (lowerCommand.includes('game') || lowerCommand.includes('create game')) {
+                activateTool('game');
+                speakResponse('Game creator mode! What kind of game shall we build?');
+            } else if (lowerCommand.includes('world') || lowerCommand.includes('world builder')) {
+                activateTool('world');
+                speakResponse('World builder activated. Describe your world to me.');
+            } else if (lowerCommand.includes('emotion') || lowerCommand.includes('feelings')) {
+                activateTool('emotion');
+                speakResponse('Emotion mapper ready. How are you feeling right now?');
+            } else if (lowerCommand.includes('chaos') || lowerCommand.includes('random')) {
+                activateTool('chaos');
+                speakResponse('Chaos generator unleashed! Let\'s create some creative madness!');
+            } else if (lowerCommand.includes('speak') || lowerCommand.includes('talk')) {
+                toggleSpeech();
+            } else if (lowerCommand.includes('stop') || lowerCommand.includes('quiet')) {
+                stopSpeaking();
+                speakResponse('Going quiet now.');
+            } else if (lowerCommand.includes('clear') || lowerCommand.includes('reset')) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                speakResponse('Canvas cleared. Fresh start!');
+            } else {
+                // Default response for unrecognized commands
+                const responses = [
+                    'Interesting command! Let me think about that.',
+                    'I\'m not sure I understand, but that sounds creative!',
+                    'Tell me more about what you want to create.',
+                    'That\'s a unique request! Let\'s explore it together.'
+                ];
+                const response = responses[Math.floor(Math.random() * responses.length)];
+                speakResponse(response);
+            }
+        }
+
+        // Text-to-Speech
+        function speakResponse(text) {
+            if (!speechSynthesis) return;
+
+            // Stop any current speech
+            speechSynthesis.cancel();
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.9;
+            utterance.pitch = 1;
+            utterance.volume = 0.8;
+
+            utterance.onstart = function() {
+                isSpeaking = true;
+                document.getElementById('speakButton').classList.add('active');
+                statusText.textContent = '🗣️ AI is speaking...';
+            };
+
+            utterance.onend = function() {
+                isSpeaking = false;
+                document.getElementById('speakButton').classList.remove('active');
+                statusText.textContent = 'AI finished speaking.';
+            };
+
+            speechSynthesis.speak(utterance);
+            createSpeechBubble(text, 'ai');
+        }
+
+        // Toggle speech on/off
+        function toggleSpeech() {
+            if (isSpeaking) {
+                stopSpeaking();
+            } else {
+                speakResponse('Speech synthesis activated. I can now speak my thoughts!');
+            }
+        }
+
+        // Stop speaking
+        function stopSpeaking() {
+            if (speechSynthesis) {
+                speechSynthesis.cancel();
+            }
+            isSpeaking = false;
+            document.getElementById('speakButton').classList.remove('active');
+        }
+
+        // Audio visualization
+        function updateVisualizer() {
+            if (!analyser) return;
+
+            const bufferLength = analyser.frequencyBinCount;
+            const dataArray = new Uint8Array(bufferLength);
+
+            function update() {
+                analyser.getByteFrequencyData(dataArray);
+
+                const bars = document.querySelectorAll('.bar');
+                const barCount = bars.length;
+
+                for (let i = 0; i < barCount; i++) {
+                    const value = dataArray[Math.floor(i * bufferLength / barCount)];
+                    const height = (value / 255) * 100;
+                    bars[i].style.height = height + '%';
+                }
+
+                animationFrame = requestAnimationFrame(update);
+            }
+
+            update();
+        }
+
+        // Voice wave effect
+        function createVoiceWave() {
+            const wave = document.createElement('div');
+            wave.className = 'voice-wave';
+            wave.style.left = '50%';
+            wave.style.top = '50%';
+            wave.style.width = '100px';
+            wave.style.height = '100px';
+            wave.style.marginLeft = '-50px';
+            wave.style.marginTop = '-50px';
+
+            document.querySelector('.canvas-container').appendChild(wave);
+            voiceWaves.push(wave);
+
+            setTimeout(() => {
+                if (wave.parentNode) {
+                    wave.remove();
+                }
+            }, 2000);
+        }
+
+        function removeVoiceWaves() {
+            voiceWaves.forEach(wave => {
+                if (wave.parentNode) {
+                    wave.remove();
+                }
+            });
+            voiceWaves = [];
+        }
+
+        // Speech bubble creation
+        function createSpeechBubble(text, type) {
+            const bubble = document.createElement('div');
+            bubble.className = 'speech-bubble';
+            bubble.textContent = type === 'user' ? `You said: "${text}"` : `AI: "${text}"`;
+            bubble.style.background = type === 'user' ? '#667eea' : 'white';
+            bubble.style.color = type === 'user' ? 'white' : '#2c3e50';
+            bubble.style.borderColor = type === 'user' ? '#764ba2' : '#667eea';
+
+            // Position randomly but avoid edges
+            const x = Math.random() * (canvas.width - 320) + 50;
+            const y = Math.random() * (canvas.height - 100) + 50;
+            bubble.style.left = x + 'px';
+            bubble.style.top = y + 'px';
+
+            bubble.addEventListener('click', () => {
+                bubble.classList.remove('visible');
+                setTimeout(() => bubble.remove(), 300);
+            });
+
+            document.querySelector('.canvas-container').appendChild(bubble);
+            speechBubbles.push(bubble);
+
+            // Show bubble with animation
+            setTimeout(() => bubble.classList.add('visible'), 100);
+
+            // Auto-hide after 6 seconds
+            setTimeout(() => {
+                if (bubble.parentNode) {
+                    bubble.classList.remove('visible');
+                    setTimeout(() => bubble.remove(), 300);
+                }
+            }, 6000);
+        }
+
+        // Audio control event listeners
+        document.getElementById('micButton').addEventListener('click', function() {
+            if (!recognition) {
+                initSpeechRecognition();
+            }
+
+            if (isListening) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        });
+
+        document.getElementById('speakButton').addEventListener('click', toggleSpeech);
+
+        document.getElementById('musicButton').addEventListener('click', function() {
+            activateTool('music');
+            speakResponse('Let me compose some AI-generated music for you!');
+            // Here you could add actual music generation logic
+        });
+
         // Initialize canvas
         function resizeCanvas() {
             canvas.width = canvas.parentElement.clientWidth;
@@ -369,6 +790,10 @@
 
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
+
+        // Initialize audio features
+        initAudio();
+        initSpeechRecognition();
 
         // Canvas drawing functions
         function startDrawing(e) {
