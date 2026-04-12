@@ -3,8 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Somer.AI - The Most Original AI Assistant</title>
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23667eea' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' font-weight='bold' fill='white' text-anchor='middle'>AI</text></svg>">
+    <title>Somer.AI - Your AI Companion</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230059b0' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' font-weight='bold' fill='white' text-anchor='middle'>AI</text></svg>">
+    <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -13,511 +14,646 @@
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #f5f5f5;
             min-height: 100vh;
             overflow: hidden;
         }
 
-        .container {
+        .app {
             display: flex;
             height: 100vh;
-            width: 100vw;
+            background: #ffffff;
         }
 
+        /* Sidebar */
         .sidebar {
-            width: 300px;
-            background: rgba(255, 255, 255, 0.95);
-            border-right: 1px solid #e9ecef;
+            width: 320px;
+            background: #f8f9fa;
+            border-right: 1px solid #e1e5e9;
             display: flex;
             flex-direction: column;
-            backdrop-filter: blur(10px);
+            position: relative;
         }
 
-        .header {
-            padding: 20px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        .sidebar-header {
+            padding: 24px 20px 16px;
+            border-bottom: 1px solid #e1e5e9;
+            background: linear-gradient(135deg, #0059b0 0%, #0078d4 100%);
             color: white;
-            text-align: center;
+        }
+
+        .logo-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
         }
 
         .logo {
-            width: 60px;
-            height: 60px;
+            width: 40px;
+            height: 40px;
             background: white;
-            border-radius: 15px;
+            border-radius: 8px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            color: #667eea;
-            font-size: 24px;
-            margin: 0 auto 15px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            color: #0059b0;
+            font-size: 18px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
-        .header h1 {
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 5px;
+        .brand-text h1 {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 2px;
         }
 
-        .header p {
-            font-size: 14px;
+        .brand-text p {
+            font-size: 12px;
             opacity: 0.9;
+            font-weight: 400;
         }
 
-        .tools {
+        .new-chat-btn {
+            width: 100%;
+            padding: 8px 16px;
+            background: rgba(255,255,255,0.2);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 6px;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-top: 12px;
+        }
+
+        .new-chat-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .sidebar-content {
             flex: 1;
             padding: 20px;
             overflow-y: auto;
         }
 
-        .tool-section {
-            margin-bottom: 25px;
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: #605e5c;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            margin-top: 20px;
         }
 
-        .tool-section h3 {
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
+        .tool-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+            font-size: 14px;
+            font-weight: 400;
+            color: #323130;
+        }
+
+        .tool-item:hover {
+            background: #e1e5e9;
+        }
+
+        .tool-item.active {
+            background: #0059b0;
+            color: white;
+        }
+
+        .tool-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+
+        /* Main Chat Area */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #ffffff;
+        }
+
+        .chat-header {
+            padding: 16px 24px;
+            border-bottom: 1px solid #e1e5e9;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-title {
             font-size: 16px;
             font-weight: 600;
-            color: #2c3e50;
-            margin-bottom: 15px;
-            border-bottom: 2px solid #667eea;
-            padding-bottom: 5px;
-        }
-
-        .tool-button {
-            display: block;
-            width: 100%;
-            padding: 12px 15px;
-            margin-bottom: 8px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
-            transition: all 0.3s;
-            text-align: left;
-        }
-
-        .tool-button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
-        }
-
-        .tool-button.active {
-            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
-        }
-
-        .canvas-area {
-            flex: 1;
-            position: relative;
-            background: #ffffff;
-            overflow: hidden;
-        }
-
-        .canvas-container {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, #f8f9fa 25%, transparent 25%),
-                        linear-gradient(-45deg, #f8f9fa 25%, transparent 25%),
-                        linear-gradient(45deg, transparent 75%, #f8f9fa 75%),
-                        linear-gradient(-45deg, transparent 75%, #f8f9fa 75%);
-            background-size: 20px 20px;
-            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
-        }
-
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            cursor: crosshair;
-        }
-
-        .floating-elements {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none;
-        }
-
-        .floating-element {
-            position: absolute;
-            background: rgba(102, 126, 234, 0.9);
-            color: white;
-            padding: 8px 12px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-            animation: float 3s ease-in-out infinite;
-            pointer-events: auto;
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .floating-element:hover {
-            transform: scale(1.05);
-            background: rgba(102, 126, 234, 1);
-        }
-
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-
-        .ai-brain {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            background: radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, rgba(102, 126, 234, 0.1) 70%, transparent 100%);
-            animation: pulse 2s ease-in-out infinite;
-            pointer-events: none;
-        }
-
-        @keyframes pulse {
-            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
-            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
-        }
-
-        .thought-bubble {
-            position: absolute;
-            background: white;
-            border: 2px solid #667eea;
-            border-radius: 15px;
-            padding: 15px;
-            max-width: 250px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            opacity: 0;
-            transform: scale(0.8);
-            transition: all 0.3s;
-            pointer-events: auto;
-            cursor: pointer;
-        }
-
-        .thought-bubble.visible {
-            opacity: 1;
-            transform: scale(1);
-        }
-
-        .thought-bubble::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 30px;
-            width: 0;
-            height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-top: 10px solid #667eea;
-        }
-
-        .status-bar {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            right: 0;
-            background: rgba(255, 255, 255, 0.95);
-            border-top: 1px solid #e9ecef;
-            padding: 10px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            backdrop-filter: blur(10px);
-        }
-
-        .status-text {
-            font-size: 14px;
-            color: #6c757d;
-        }
-
-        .ai-mood {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .mood-indicator {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: #22c55e;
-            animation: mood-pulse 2s ease-in-out infinite;
-        }
-
-        @keyframes mood-pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
-
-        .mood-text {
-            font-size: 12px;
-            color: #22c55e;
-            font-weight: 500;
+            color: #323130;
         }
 
         .audio-controls {
-            position: absolute;
-            bottom: 20px;
-            left: 20px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 12px;
-            padding: 15px;
             display: flex;
-            gap: 10px;
-            align-items: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-            backdrop-filter: blur(10px);
+            gap: 8px;
         }
 
-        .audio-button {
-            width: 40px;
-            height: 40px;
+        .audio-btn {
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             border: none;
+            background: #f3f2f1;
+            color: #605e5c;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
-            transition: all 0.3s;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            font-size: 14px;
+            transition: all 0.2s;
         }
 
-        .audio-button:hover {
-            transform: scale(1.1);
+        .audio-btn:hover {
+            background: #e1e5e9;
         }
 
-        .audio-button.active {
-            background: #22c55e !important;
+        .audio-btn.active {
+            background: #0059b0;
             color: white;
         }
 
-        .audio-button.recording {
-            background: #ef4444 !important;
+        .audio-btn.recording {
+            background: #d13438;
             color: white;
-            animation: pulse-red 1s infinite;
+            animation: pulse 1.5s infinite;
         }
 
-        @keyframes pulse-red {
+        @keyframes pulse {
             0%, 100% { opacity: 1; }
             50% { opacity: 0.7; }
         }
 
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .message {
+            display: flex;
+            gap: 12px;
+            max-width: 80%;
+        }
+
+        .message.user {
+            align-self: flex-end;
+            flex-direction: row-reverse;
+        }
+
+        .message-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .message.user .message-avatar {
+            background: #0059b0;
+            color: white;
+        }
+
+        .message.bot .message-avatar {
+            background: #f3f2f1;
+            color: #605e5c;
+        }
+
+        .message-content {
+            background: #f3f2f1;
+            padding: 12px 16px;
+            border-radius: 16px;
+            font-size: 14px;
+            line-height: 1.4;
+            color: #323130;
+        }
+
+        .message.user .message-content {
+            background: #0059b0;
+            color: white;
+        }
+
+        .message.bot .message-content {
+            border-bottom-left-radius: 4px;
+        }
+
+        .message.user .message-content {
+            border-bottom-right-radius: 4px;
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 12px 16px;
+            background: #f3f2f1;
+            border-radius: 16px;
+            border-bottom-left-radius: 4px;
+            font-size: 14px;
+            color: #605e5c;
+            align-self: flex-start;
+        }
+
+        .typing-indicator.active {
+            display: block;
+        }
+
+        .chat-input-area {
+            padding: 20px 24px;
+            border-top: 1px solid #e1e5e9;
+            background: #ffffff;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 12px;
+            align-items: flex-end;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #e1e5e9;
+            border-radius: 20px;
+            font-size: 14px;
+            font-family: inherit;
+            outline: none;
+            resize: none;
+            min-height: 20px;
+            max-height: 100px;
+            transition: border-color 0.2s;
+        }
+
+        .chat-input:focus {
+            border-color: #0059b0;
+            box-shadow: 0 0 0 1px #0059b0;
+        }
+
+        .send-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #0059b0;
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.2s;
+        }
+
+        .send-btn:hover {
+            background: #004c99;
+            transform: scale(1.05);
+        }
+
+        .send-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Audio Visualizer */
         .audio-visualizer {
-            position: absolute;
-            top: 20px;
-            right: 20px;
+            position: fixed;
+            bottom: 100px;
+            right: 24px;
             width: 200px;
-            height: 60px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 12px;
-            padding: 10px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            height: 40px;
+            background: rgba(0,0,0,0.8);
+            border-radius: 20px;
+            padding: 8px 16px;
+            display: none;
             backdrop-filter: blur(10px);
+        }
+
+        .audio-visualizer.active {
+            display: block;
         }
 
         .visualizer-bars {
             display: flex;
             align-items: end;
             justify-content: space-between;
-            height: 40px;
-            gap: 2px;
+            height: 24px;
+            gap: 1px;
         }
 
         .bar {
-            width: 4px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            width: 3px;
+            background: #00cc44;
             border-radius: 2px;
             transition: height 0.1s;
         }
 
-        .voice-wave {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(102, 126, 234, 0.3);
-            pointer-events: none;
-            animation: voice-wave 2s infinite;
+        /* Welcome Screen */
+        .welcome-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+            text-align: center;
+            padding: 40px;
         }
 
-        @keyframes voice-wave {
-            0% {
-                transform: scale(1);
-                opacity: 0.7;
-            }
-            100% {
-                transform: scale(2);
-                opacity: 0;
-            }
+        .welcome-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #0059b0 0%, #0078d4 100%);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 36px;
+            color: white;
+            margin-bottom: 24px;
+            box-shadow: 0 8px 24px rgba(0,89,176,0.3);
         }
 
-        .speech-bubble {
-            position: absolute;
-            background: white;
-            border: 2px solid #667eea;
-            border-radius: 15px;
-            padding: 15px;
-            max-width: 300px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-            opacity: 0;
-            transform: scale(0.8);
-            transition: all 0.3s;
-            pointer-events: auto;
+        .welcome-title {
+            font-size: 32px;
+            font-weight: 600;
+            color: #323130;
+            margin-bottom: 8px;
+        }
+
+        .welcome-subtitle {
+            font-size: 16px;
+            color: #605e5c;
+            margin-bottom: 32px;
+            max-width: 400px;
+            line-height: 1.5;
+        }
+
+        .suggestion-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .suggestion-card {
+            padding: 16px;
+            background: #f8f9fa;
+            border: 1px solid #e1e5e9;
+            border-radius: 8px;
             cursor: pointer;
-            z-index: 1000;
+            transition: all 0.2s;
+            text-align: left;
         }
 
-        .speech-bubble.visible {
-            opacity: 1;
-            transform: scale(1);
+        .suggestion-card:hover {
+            background: #f3f2f1;
+            border-color: #0059b0;
+            transform: translateY(-2px);
         }
 
-        .speech-bubble::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            left: 30px;
-            width: 0;
-            height: 0;
-            border-left: 10px solid transparent;
-            border-right: 10px solid transparent;
-            border-top: 10px solid #667eea;
+        .suggestion-icon {
+            font-size: 20px;
+            margin-bottom: 8px;
+        }
+
+        .suggestion-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: #323130;
+            margin-bottom: 4px;
+        }
+
+        .suggestion-desc {
+            font-size: 12px;
+            color: #605e5c;
+            line-height: 1.3;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                width: 280px;
+            }
+
+            .chat-messages {
+                padding: 16px;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+
+            .welcome-title {
+                font-size: 24px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .app {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 200px;
+                border-right: none;
+                border-bottom: 1px solid #e1e5e9;
+            }
+
+            .main-content {
+                height: calc(100vh - 200px);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
+    <div class="app">
+        <!-- Sidebar -->
         <div class="sidebar">
-            <div class="header">
-                <div class="logo">AI</div>
-                <h1>Somer.AI</h1>
-                <p>The Most Original AI</p>
+            <div class="sidebar-header">
+                <div class="logo-section">
+                    <div class="logo">AI</div>
+                    <div class="brand-text">
+                        <h1>Somer.AI</h1>
+                        <p>Your AI Companion</p>
+                    </div>
+                </div>
+                <button class="new-chat-btn" onclick="startNewChat()">+ New chat</button>
             </div>
 
-            <div class="tools">
-                <div class="tool-section">
-                    <h3>🎨 Creative Tools</h3>
-                    <button class="tool-button" onclick="activateTool('mindmap')">Mind Map Creator</button>
-                    <button class="tool-button" onclick="activateTool('story')">Story Weaver</button>
-                    <button class="tool-button" onclick="activateTool('art')">Digital Artist</button>
-                    <button class="tool-button" onclick="activateTool('music')">Music Composer</button>
+            <div class="sidebar-content">
+                <div class="section-title">Creative Tools</div>
+                <div class="tool-item" onclick="activateTool('mindmap')">
+                    <div class="tool-icon">🧠</div>
+                    <span>Mind Map Creator</span>
+                </div>
+                <div class="tool-item" onclick="activateTool('story')">
+                    <div class="tool-icon">📖</div>
+                    <span>Story Weaver</span>
+                </div>
+                <div class="tool-item" onclick="activateTool('art')">
+                    <div class="tool-icon">🎨</div>
+                    <span>Digital Artist</span>
+                </div>
+                <div class="tool-item" onclick="activateTool('music')">
+                    <div class="tool-icon">🎵</div>
+                    <span>Music Composer</span>
                 </div>
 
-                <div class="tool-section">
-                    <h3>🧠 Thinking Tools</h3>
-                    <button class="tool-button" onclick="activateTool('logic')">Logic Visualizer</button>
-                    <button class="tool-button" onclick="activateTool('problem')">Problem Solver</button>
-                    <button class="tool-button" onclick="activateTool('dream')">Dream Interpreter</button>
-                    <button class="tool-button" onclick="activateTool('future')">Future Predictor</button>
+                <div class="section-title">Thinking Tools</div>
+                <div class="tool-item" onclick="activateTool('logic')">
+                    <div class="tool-icon">🔍</div>
+                    <span>Logic Visualizer</span>
+                </div>
+                <div class="tool-item" onclick="activateTool('problem')">
+                    <div class="tool-icon">💡</div>
+                    <span>Problem Solver</span>
+                </div>
+                <div class="tool-item" onclick="activateTool('dream')">
+                    <div class="tool-icon">🌙</div>
+                    <span>Dream Interpreter</span>
+                </div>
+                <div class="tool-item" onclick="activateTool('future')">
+                    <div class="tool-icon">🔮</div>
+                    <span>Future Predictor</span>
                 </div>
 
-                <div class="tool-section">
-                    <h3>🌟 Interactive</h3>
-                    <button class="tool-button" onclick="activateTool('game')">Game Creator</button>
-                    <button class="tool-button" onclick="activateTool('world')">World Builder</button>
-                    <button class="tool-button" onclick="activateTool('emotion')">Emotion Mapper</button>
-                    <button class="tool-button" onclick="activateTool('chaos')">Chaos Generator</button>
+                <div class="section-title">Interactive</div>
+                <div class="tool-item" onclick="activateTool('game')">
+                    <div class="tool-icon">🎮</div>
+                    <span>Game Creator</span>
+                </div>
+                <div class="tool-item" onclick="activateTool('world')">
+                    <div class="tool-icon">🌍</div>
+                    <span>World Builder</span>
+                </div>
+                <div class="tool-item" onclick="activateTool('emotion')">
+                    <div class="tool-icon">❤️</div>
+                    <span>Emotion Mapper</span>
+                </div>
+                <div class="tool-item" onclick="activateTool('chaos')">
+                    <div class="tool-icon">🎲</div>
+                    <span>Chaos Generator</span>
                 </div>
             </div>
         </div>
 
-        <div class="canvas-area">
-            <div class="canvas-container">
-                <canvas id="mainCanvas"></canvas>
-                <div class="ai-brain"></div>
-                <div class="floating-elements" id="floatingElements"></div>
-
-                <!-- Audio Controls -->
-                <div class="audio-controls" id="audioControls">
-                    <button class="audio-button" id="micButton" title="Voice Input">🎤</button>
-                    <button class="audio-button" id="speakButton" title="Text-to-Speech">🔊</button>
-                    <button class="audio-button" id="musicButton" title="AI Music">🎵</button>
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="chat-header">
+                <div class="chat-title">Chat</div>
+                <div class="audio-controls">
+                    <button class="audio-btn" id="micBtn" title="Voice Input">🎤</button>
+                    <button class="audio-btn" id="speakBtn" title="Text-to-Speech">🔊</button>
                 </div>
+            </div>
 
-                <!-- Audio Visualizer -->
-                <div class="audio-visualizer" id="audioVisualizer">
-                    <div class="visualizer-bars" id="visualizerBars">
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
-                        <div class="bar"></div>
+            <div class="chat-messages" id="messages">
+                <div class="welcome-screen">
+                    <div class="welcome-icon">AI</div>
+                    <h2 class="welcome-title">Hello! I'm Somer.AI</h2>
+                    <p class="welcome-subtitle">Your intelligent companion for creativity, problem-solving, and conversation. Choose a tool or start chatting!</p>
+
+                    <div class="suggestion-grid">
+                        <div class="suggestion-card" onclick="sendQuickMessage('Create a mind map for project planning')">
+                            <div class="suggestion-icon">🧠</div>
+                            <div class="suggestion-title">Mind Map</div>
+                            <div class="suggestion-desc">Visualize ideas and plan projects</div>
+                        </div>
+                        <div class="suggestion-card" onclick="sendQuickMessage('Tell me a creative story')">
+                            <div class="suggestion-icon">📖</div>
+                            <div class="suggestion-title">Story Time</div>
+                            <div class="suggestion-desc">Generate imaginative stories</div>
+                        </div>
+                        <div class="suggestion-card" onclick="sendQuickMessage('Help me solve this problem')">
+                            <div class="suggestion-icon">💡</div>
+                            <div class="suggestion-title">Problem Solver</div>
+                            <div class="suggestion-desc">Find solutions to challenges</div>
+                        </div>
+                        <div class="suggestion-card" onclick="sendQuickMessage('What does this dream mean?')">
+                            <div class="suggestion-icon">🌙</div>
+                            <div class="suggestion-title">Dream Analysis</div>
+                            <div class="suggestion-desc">Interpret dreams and symbols</div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <div class="status-bar">
-                <div class="status-text" id="statusText">AI is ready to create something amazing...</div>
-                <div class="ai-mood">
-                    <div class="mood-indicator"></div>
-                    <span class="mood-text" id="moodText">Creative</span>
+            <div class="typing-indicator" id="typing">Somer.AI is thinking...</div>
+
+            <div class="chat-input-area">
+                <div class="input-container">
+                    <textarea
+                        class="chat-input"
+                        id="userInput"
+                        placeholder="Ask me anything or choose a tool from the sidebar..."
+                        rows="1"
+                    ></textarea>
+                    <button class="send-btn" onclick="sendMessage()">➤</button>
                 </div>
+            </div>
+        </div>
+
+        <!-- Audio Visualizer -->
+        <div class="audio-visualizer" id="audioVisualizer">
+            <div class="visualizer-bars" id="visualizerBars">
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
+                <div class="bar"></div><div class="bar"></div><div class="bar"></div><div class="bar"></div>
             </div>
         </div>
     </div>
 
     <script>
-        const canvas = document.getElementById('mainCanvas');
-        const ctx = canvas.getContext('2d');
-        const floatingElements = document.getElementById('floatingElements');
-        const statusText = document.getElementById('statusText');
-        const moodText = document.getElementById('moodText');
+        const messagesContainer = document.getElementById('messages');
+        const userInput = document.getElementById('userInput');
+        const typingIndicator = document.getElementById('typing');
+        const micBtn = document.getElementById('micBtn');
+        const speakBtn = document.getElementById('speakBtn');
+        const audioVisualizer = document.getElementById('audioVisualizer');
 
         let currentTool = null;
-        let isDrawing = false;
-        let lastX = 0;
-        let lastY = 0;
-        let floatingIdeas = [];
-        let aiThoughts = [
-            "What if we could fly?",
-            "Colors have emotions too",
-            "Time is just a suggestion",
-            "Dreams are reality's blueprint",
-            "Music is mathematics we can hear",
-            "Every problem has infinite solutions",
-            "Creativity is intelligence having fun",
-            "The universe is made of stories",
-            "Thoughts are living things",
-            "Imagination is the ultimate reality"
-        ];
-
-        // Audio AI variables
-        let recognition = null;
-        let speechSynthesis = window.speechSynthesis;
         let isListening = false;
         let isSpeaking = false;
+        let recognition = null;
+        let speechSynthesis = window.speechSynthesis;
         let audioContext = null;
         let analyser = null;
-        let microphone = null;
         let animationFrame = null;
-        let voiceWaves = [];
-        let speechBubbles = [];
 
-        // Initialize audio context
+        // Initialize audio
         function initAudio() {
             try {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -539,137 +675,311 @@
 
                 recognition.onstart = function() {
                     isListening = true;
-                    document.getElementById('micButton').classList.add('recording');
-                    statusText.textContent = '🎤 Listening... Speak your command!';
-                    createVoiceWave();
+                    micBtn.classList.add('recording');
+                    showStatus('Listening...');
                 };
 
                 recognition.onresult = function(event) {
                     const transcript = event.results[0][0].transcript;
-                    handleVoiceCommand(transcript);
+                    userInput.value = transcript;
+                    sendMessage();
                 };
 
                 recognition.onend = function() {
                     isListening = false;
-                    document.getElementById('micButton').classList.remove('recording');
-                    statusText.textContent = 'Voice command processed!';
-                    removeVoiceWaves();
+                    micBtn.classList.remove('recording');
+                    showStatus('Ready');
                 };
 
                 recognition.onerror = function(event) {
                     console.error('Speech recognition error:', event.error);
-                    statusText.textContent = 'Voice recognition error. Try again.';
+                    showStatus('Voice recognition error');
                 };
-            } else {
-                alert('Speech recognition not supported in this browser.');
             }
         }
 
-        // Voice command handler
-        function handleVoiceCommand(command) {
-            const lowerCommand = command.toLowerCase();
-            createSpeechBubble(command, 'user');
+        // Auto-resize textarea
+        userInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = Math.min(this.scrollHeight, 100) + 'px';
+        });
 
-            // Voice commands
-            if (lowerCommand.includes('mind map') || lowerCommand.includes('mindmap')) {
-                activateTool('mindmap');
-                speakResponse('Opening mind map creator. Start drawing your thoughts!');
-            } else if (lowerCommand.includes('story') || lowerCommand.includes('tell me a story')) {
-                activateTool('story');
-                speakResponse('Story weaver activated. What kind of story shall we create together?');
-            } else if (lowerCommand.includes('draw') || lowerCommand.includes('art')) {
-                activateTool('art');
-                speakResponse('Digital artist mode activated. Draw your vision on the canvas!');
-            } else if (lowerCommand.includes('music') || lowerCommand.includes('play music')) {
-                activateTool('music');
-                speakResponse('Music composer ready. What mood should our composition have?');
-            } else if (lowerCommand.includes('logic') || lowerCommand.includes('logic visualizer')) {
-                activateTool('logic');
-                speakResponse('Logic visualizer activated. Let\'s map out your reasoning!');
-            } else if (lowerCommand.includes('dream') || lowerCommand.includes('dream interpreter')) {
-                activateTool('dream');
-                speakResponse('Dream interpreter ready. Share your dream with me.');
-            } else if (lowerCommand.includes('future') || lowerCommand.includes('predict')) {
-                activateTool('future');
-                speakResponse('Future predictor activated. What future interests you?');
-            } else if (lowerCommand.includes('game') || lowerCommand.includes('create game')) {
-                activateTool('game');
-                speakResponse('Game creator mode! What kind of game shall we build?');
-            } else if (lowerCommand.includes('world') || lowerCommand.includes('world builder')) {
-                activateTool('world');
-                speakResponse('World builder activated. Describe your world to me.');
-            } else if (lowerCommand.includes('emotion') || lowerCommand.includes('feelings')) {
-                activateTool('emotion');
-                speakResponse('Emotion mapper ready. How are you feeling right now?');
-            } else if (lowerCommand.includes('chaos') || lowerCommand.includes('random')) {
-                activateTool('chaos');
-                speakResponse('Chaos generator unleashed! Let\'s create some creative madness!');
-            } else if (lowerCommand.includes('speak') || lowerCommand.includes('talk')) {
-                toggleSpeech();
-            } else if (lowerCommand.includes('stop') || lowerCommand.includes('quiet')) {
-                stopSpeaking();
-                speakResponse('Going quiet now.');
-            } else if (lowerCommand.includes('clear') || lowerCommand.includes('reset')) {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                speakResponse('Canvas cleared. Fresh start!');
-            } else {
-                // Default response for unrecognized commands
-                const responses = [
-                    'Interesting command! Let me think about that.',
-                    'I\'m not sure I understand, but that sounds creative!',
-                    'Tell me more about what you want to create.',
-                    'That\'s a unique request! Let\'s explore it together.'
-                ];
-                const response = responses[Math.floor(Math.random() * responses.length)];
-                speakResponse(response);
+        // Send message on Enter
+        userInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
             }
+        });
+
+        // Send message
+        function sendMessage() {
+            const message = userInput.value.trim();
+            if (!message) return;
+
+            // Hide welcome screen
+            const welcomeScreen = document.querySelector('.welcome-screen');
+            if (welcomeScreen) {
+                welcomeScreen.style.display = 'none';
+            }
+
+            // Add user message
+            addMessage(message, 'user');
+
+            // Clear input
+            userInput.value = '';
+            userInput.style.height = 'auto';
+
+            // Show typing indicator
+            typingIndicator.classList.add('active');
+
+            // Scroll to bottom
+            scrollToBottom();
+
+            // Generate response
+            setTimeout(() => {
+                typingIndicator.classList.remove('active');
+                const response = generateResponse(message);
+                addMessage(response, 'bot');
+                scrollToBottom();
+
+                // Speak response if speech is enabled
+                if (isSpeaking) {
+                    speakResponse(response);
+                }
+            }, 1000 + Math.random() * 2000);
         }
 
-        // Text-to-Speech
-        function speakResponse(text) {
-            if (!speechSynthesis) return;
-
-            // Stop any current speech
-            speechSynthesis.cancel();
-
-            const utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 0.9;
-            utterance.pitch = 1;
-            utterance.volume = 0.8;
-
-            utterance.onstart = function() {
-                isSpeaking = true;
-                document.getElementById('speakButton').classList.add('active');
-                statusText.textContent = '🗣️ AI is speaking...';
-            };
-
-            utterance.onend = function() {
-                isSpeaking = false;
-                document.getElementById('speakButton').classList.remove('active');
-                statusText.textContent = 'AI finished speaking.';
-            };
-
-            speechSynthesis.speak(utterance);
-            createSpeechBubble(text, 'ai');
+        // Send quick message from suggestions
+        function sendQuickMessage(message) {
+            userInput.value = message;
+            sendMessage();
         }
 
-        // Toggle speech on/off
-        function toggleSpeech() {
+        // Start new chat
+        function startNewChat() {
+            messagesContainer.innerHTML = `
+                <div class="welcome-screen">
+                    <div class="welcome-icon">AI</div>
+                    <h2 class="welcome-title">Hello! I'm Somer.AI</h2>
+                    <p class="welcome-subtitle">Your intelligent companion for creativity, problem-solving, and conversation. Choose a tool or start chatting!</p>
+
+                    <div class="suggestion-grid">
+                        <div class="suggestion-card" onclick="sendQuickMessage('Create a mind map for project planning')">
+                            <div class="suggestion-icon">🧠</div>
+                            <div class="suggestion-title">Mind Map</div>
+                            <div class="suggestion-desc">Visualize ideas and plan projects</div>
+                        </div>
+                        <div class="suggestion-card" onclick="sendQuickMessage('Tell me a creative story')">
+                            <div class="suggestion-icon">📖</div>
+                            <div class="suggestion-title">Story Time</div>
+                            <div class="suggestion-desc">Generate imaginative stories</div>
+                        </div>
+                        <div class="suggestion-card" onclick="sendQuickMessage('Help me solve this problem')">
+                            <div class="suggestion-icon">💡</div>
+                            <div class="suggestion-title">Problem Solver</div>
+                            <div class="suggestion-desc">Find solutions to challenges</div>
+                        </div>
+                        <div class="suggestion-card" onclick="sendQuickMessage('What does this dream mean?')">
+                            <div class="suggestion-icon">🌙</div>
+                            <div class="suggestion-title">Dream Analysis</div>
+                            <div class="suggestion-desc">Interpret dreams and symbols</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            currentTool = null;
+            document.querySelectorAll('.tool-item').forEach(item => item.classList.remove('active'));
+        }
+
+        // Add message to chat
+        function addMessage(content, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+
+            const avatarDiv = document.createElement('div');
+            avatarDiv.className = 'message-avatar';
+            avatarDiv.textContent = type === 'user' ? 'You' : 'AI';
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.innerHTML = formatMessage(content);
+
+            messageDiv.appendChild(avatarDiv);
+            messageDiv.appendChild(contentDiv);
+            messagesContainer.appendChild(messageDiv);
+        }
+
+        // Format message content
+        function formatMessage(text) {
+            // Basic formatting for code and links
+            text = text.replace(/`([^`]+)`/g, '<code>$1</code>');
+            text = text.replace(/\n/g, '<br>');
+            return text;
+        }
+
+        // Generate AI response
+        function generateResponse(message) {
+            const lowerMessage = message.toLowerCase();
+
+            // Tool-specific responses
+            if (currentTool) {
+                return generateToolResponse(message, currentTool);
+            }
+
+            // General responses
+            if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
+                return "Hello! I'm Somer.AI, your intelligent companion. I can help you with creative tasks, problem-solving, storytelling, and much more. What would you like to work on today?";
+            }
+
+            if (lowerMessage.includes('help')) {
+                return "I can assist you with:\n\n🧠 **Mind Mapping** - Visualize ideas and plan projects\n📖 **Storytelling** - Create imaginative stories\n🎨 **Digital Art** - Generate artistic concepts\n🎵 **Music** - Compose and describe music\n💡 **Problem Solving** - Find solutions to challenges\n\nChoose a tool from the sidebar or just ask me anything!";
+            }
+
+            if (lowerMessage.includes('thank')) {
+                return "You're welcome! I'm here whenever you need creative inspiration or help with problem-solving. What else can I assist you with?";
+            }
+
+            // Default creative response
+            const responses = [
+                "That's an interesting thought! Let me help you explore that idea further. What specific aspect would you like to focus on?",
+                "I love that you're thinking about this! I can help you develop this concept. Would you like me to suggest some creative approaches?",
+                "Great question! Let me think about this from different angles. Here are some insights I can offer...",
+                "I'm excited to help you with this! Based on what you've shared, I can suggest several approaches. Which direction interests you most?",
+                "That's a fascinating topic! I can help you explore this through various creative lenses. What would you like to discover?"
+            ];
+
+            return responses[Math.floor(Math.random() * responses.length)];
+        }
+
+        // Generate tool-specific responses
+        function generateToolResponse(message, tool) {
+            const responses = {
+                mindmap: [
+                    "Let's create a mind map for this! Start by identifying the central idea, then branch out to related concepts. What should be at the center of your mind map?",
+                    "For effective mind mapping, focus on keywords and images rather than full sentences. What are the main categories that branch from your central idea?",
+                    "Mind maps work best when you let ideas flow freely. Don't worry about organization initially - we can structure it later. What's the first idea that comes to mind?"
+                ],
+                story: [
+                    "Every great story needs a compelling beginning. Let's start with an intriguing hook. What kind of story world interests you - fantasy, mystery, adventure?",
+                    "Character development is key to engaging stories. Let's create a protagonist with depth. What motivates your main character?",
+                    "Stories thrive on conflict and resolution. What's the central challenge your character will face in this story?"
+                ],
+                art: [
+                    "Visual art is about expressing emotion through imagery. What mood or feeling would you like your artwork to convey?",
+                    "Color theory plays a big role in visual impact. What colors speak to you for this piece - warm and energetic, or cool and calming?",
+                    "Composition guides the viewer's eye. Let's think about focal points and balance. What should be the most prominent element?"
+                ],
+                music: [
+                    "Music has the power to evoke deep emotions. What feeling would you like your composition to express - joy, melancholy, energy?",
+                    "Rhythm and tempo set the pace. Would you prefer something fast and lively, or slow and contemplative?",
+                    "Musical themes can tell stories. What narrative would you like your music to suggest?"
+                ],
+                logic: [
+                    "Logical thinking requires clear premises and valid conclusions. What problem are we analyzing today?",
+                    "Breaking complex issues into smaller parts often reveals solutions. What are the key components of this situation?",
+                    "Different logical frameworks can illuminate different aspects. Should we approach this deductively or inductively?"
+                ],
+                problem: [
+                    "Effective problem-solving starts with clear definition. Can you describe the problem in specific terms?",
+                    "Every problem has constraints and requirements. What are the key limitations and goals here?",
+                    "Creative solutions often come from looking at problems from new angles. What assumptions might we challenge?"
+                ],
+                dream: [
+                    "Dreams often symbolize unconscious thoughts and emotions. What stood out most vividly in this dream?",
+                    "Dream imagery can be highly personal. What emotions did you experience during the dream?",
+                    "Recurring symbols in dreams often carry significant meaning. Are there any familiar elements that appear frequently?"
+                ],
+                future: [
+                    "Future prediction involves analyzing current trends and possibilities. What time frame are you interested in?",
+                    "Multiple scenarios help us prepare for different outcomes. What variables might influence this future?",
+                    "Strategic foresight combines data with imagination. What signals are you seeing in the present?"
+                ],
+                game: [
+                    "Great games balance challenge with achievable goals. What type of gameplay excites you most?",
+                    "Player motivation drives engagement. What will make players want to keep playing?",
+                    "Game mechanics should feel intuitive yet offer depth. What's the core action players will repeat?"
+                ],
+                world: [
+                    "World-building starts with fundamental rules and characteristics. What kind of world are you envisioning?",
+                    "Culture and society give worlds life and authenticity. What values define this civilization?",
+                    "Conflict and stakes create compelling narratives. What challenges threaten this world?"
+                ],
+                emotion: [
+                    "Emotions are complex and often layered. What primary emotion are you experiencing right now?",
+                    "Understanding emotional triggers helps us respond effectively. What situations tend to evoke this feeling?",
+                    "Emotional intelligence involves recognizing patterns. How does this emotion typically manifest for you?"
+                ],
+                chaos: [
+                    "Embracing chaos can lead to unexpected creativity. What constraints would you like to break?",
+                    "Random elements can spark innovation. What would happen if we combined seemingly unrelated ideas?",
+                    "Chaos often reveals hidden patterns. What unexpected connections are emerging?"
+                ]
+            };
+
+            const toolResponses = responses[tool] || ["I'm ready to help with this! What specific aspect would you like to explore?"];
+            return toolResponses[Math.floor(Math.random() * toolResponses.length)];
+        }
+
+        // Activate tool
+        function activateTool(toolName) {
+            currentTool = toolName;
+
+            // Update UI
+            document.querySelectorAll('.tool-item').forEach(item => {
+                item.classList.remove('active');
+                if (item.textContent.toLowerCase().includes(toolName)) {
+                    item.classList.add('active');
+                }
+            });
+
+            // Generate tool activation message
+            const toolMessages = {
+                mindmap: "🧠 Mind Map Creator activated! Let's visualize your ideas. What central concept would you like to map?",
+                story: "📖 Story Weaver activated! I'm ready to help you craft an engaging narrative. What's your story idea?",
+                art: "🎨 Digital Artist activated! Let's create something beautiful. What inspires you today?",
+                music: "🎵 Music Composer activated! What kind of musical journey shall we embark on?",
+                logic: "🔍 Logic Visualizer activated! Let's analyze this problem systematically.",
+                problem: "💡 Problem Solver activated! I'm here to help you find creative solutions.",
+                dream: "🌙 Dream Interpreter activated! Share your dream and let's explore its meaning.",
+                future: "🔮 Future Predictor activated! What future scenario interests you?",
+                game: "🎮 Game Creator activated! Let's design an engaging gaming experience.",
+                world: "🌍 World Builder activated! What kind of world shall we create together?",
+                emotion: "❤️ Emotion Mapper activated! Let's explore the landscape of feelings.",
+                chaos: "🎲 Chaos Generator activated! Let's embrace unpredictability and creativity!"
+            };
+
+            const activationMessage = toolMessages[toolName] || `Tool activated: ${toolName}`;
+            addMessage(activationMessage, 'bot');
+
             if (isSpeaking) {
-                stopSpeaking();
-            } else {
-                speakResponse('Speech synthesis activated. I can now speak my thoughts!');
+                speakResponse(activationMessage);
             }
         }
 
-        // Stop speaking
-        function stopSpeaking() {
-            if (speechSynthesis) {
+        // Audio controls
+        micBtn.addEventListener('click', function() {
+            if (!recognition) {
+                initSpeechRecognition();
+            }
+
+            if (isListening) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        });
+
+        speakBtn.addEventListener('click', function() {
+            isSpeaking = !isSpeaking;
+            speakBtn.classList.toggle('active');
+
+            if (isSpeaking) {
+                speakResponse("Voice synthesis activated. I'll now speak my responses!");
+            } else {
                 speechSynthesis.cancel();
             }
-            isSpeaking = false;
-            document.getElementById('speakButton').classList.remove('active');
-        }
+        });
 
         // Audio visualization
         function updateVisualizer() {
@@ -682,10 +992,8 @@
                 analyser.getByteFrequencyData(dataArray);
 
                 const bars = document.querySelectorAll('.bar');
-                const barCount = bars.length;
-
-                for (let i = 0; i < barCount; i++) {
-                    const value = dataArray[Math.floor(i * bufferLength / barCount)];
+                for (let i = 0; i < bars.length; i++) {
+                    const value = dataArray[Math.floor(i * bufferLength / bars.length)];
                     const height = (value / 255) * 100;
                     bars[i].style.height = height + '%';
                 }
@@ -696,359 +1004,25 @@
             update();
         }
 
-        // Voice wave effect
-        function createVoiceWave() {
-            const wave = document.createElement('div');
-            wave.className = 'voice-wave';
-            wave.style.left = '50%';
-            wave.style.top = '50%';
-            wave.style.width = '100px';
-            wave.style.height = '100px';
-            wave.style.marginLeft = '-50px';
-            wave.style.marginTop = '-50px';
-
-            document.querySelector('.canvas-container').appendChild(wave);
-            voiceWaves.push(wave);
-
-            setTimeout(() => {
-                if (wave.parentNode) {
-                    wave.remove();
-                }
-            }, 2000);
+        // Status updates
+        function showStatus(message) {
+            // Could add a status indicator here
+            console.log('Status:', message);
         }
 
-        function removeVoiceWaves() {
-            voiceWaves.forEach(wave => {
-                if (wave.parentNode) {
-                    wave.remove();
-                }
-            });
-            voiceWaves = [];
+        // Scroll to bottom
+        function scrollToBottom() {
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
         }
 
-        // Speech bubble creation
-        function createSpeechBubble(text, type) {
-            const bubble = document.createElement('div');
-            bubble.className = 'speech-bubble';
-            bubble.textContent = type === 'user' ? `You said: "${text}"` : `AI: "${text}"`;
-            bubble.style.background = type === 'user' ? '#667eea' : 'white';
-            bubble.style.color = type === 'user' ? 'white' : '#2c3e50';
-            bubble.style.borderColor = type === 'user' ? '#764ba2' : '#667eea';
-
-            // Position randomly but avoid edges
-            const x = Math.random() * (canvas.width - 320) + 50;
-            const y = Math.random() * (canvas.height - 100) + 50;
-            bubble.style.left = x + 'px';
-            bubble.style.top = y + 'px';
-
-            bubble.addEventListener('click', () => {
-                bubble.classList.remove('visible');
-                setTimeout(() => bubble.remove(), 300);
-            });
-
-            document.querySelector('.canvas-container').appendChild(bubble);
-            speechBubbles.push(bubble);
-
-            // Show bubble with animation
-            setTimeout(() => bubble.classList.add('visible'), 100);
-
-            // Auto-hide after 6 seconds
-            setTimeout(() => {
-                if (bubble.parentNode) {
-                    bubble.classList.remove('visible');
-                    setTimeout(() => bubble.remove(), 300);
-                }
-            }, 6000);
-        }
-
-        // Audio control event listeners
-        document.getElementById('micButton').addEventListener('click', function() {
-            if (!recognition) {
-                initSpeechRecognition();
-            }
-
-            if (isListening) {
-                recognition.stop();
-            } else {
-                recognition.start();
-            }
-        });
-
-        document.getElementById('speakButton').addEventListener('click', toggleSpeech);
-
-        document.getElementById('musicButton').addEventListener('click', function() {
-            activateTool('music');
-            speakResponse('Let me compose some AI-generated music for you!');
-            // Here you could add actual music generation logic
-        });
-
-        // Initialize canvas
-        function resizeCanvas() {
-            canvas.width = canvas.parentElement.clientWidth;
-            canvas.height = canvas.parentElement.clientHeight;
-        }
-
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
-
-        // Initialize audio features
+        // Initialize
         initAudio();
         initSpeechRecognition();
 
-        // Canvas drawing functions
-        function startDrawing(e) {
-            isDrawing = true;
-            [lastX, lastY] = [e.offsetX, e.offsetY];
-        }
-
-        function draw(e) {
-            if (!isDrawing) return;
-
-            ctx.beginPath();
-            ctx.moveTo(lastX, lastY);
-            ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.strokeStyle = '#667eea';
-            ctx.lineWidth = 3;
-            ctx.lineCap = 'round';
-            ctx.stroke();
-
-            [lastX, lastY] = [e.offsetX, e.offsetY];
-        }
-
-        function stopDrawing() {
-            isDrawing = false;
-        }
-
-        // Event listeners
-        canvas.addEventListener('mousedown', startDrawing);
-        canvas.addEventListener('mousemove', draw);
-        canvas.addEventListener('mouseup', stopDrawing);
-        canvas.addEventListener('mouseout', stopDrawing);
-
-        // Tool activation
-        function activateTool(toolName) {
-            currentTool = toolName;
-
-            // Update button states
-            document.querySelectorAll('.tool-button').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            event.target.classList.add('active');
-
-            // Clear canvas
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            // Activate specific tool
-            switch(toolName) {
-                case 'mindmap':
-                    activateMindMap();
-                    break;
-                case 'story':
-                    activateStoryWeaver();
-                    break;
-                case 'art':
-                    activateDigitalArtist();
-                    break;
-                case 'music':
-                    activateMusicComposer();
-                    break;
-                case 'logic':
-                    activateLogicVisualizer();
-                    break;
-                case 'problem':
-                    activateProblemSolver();
-                    break;
-                case 'dream':
-                    activateDreamInterpreter();
-                    break;
-                case 'future':
-                    activateFuturePredictor();
-                    break;
-                case 'game':
-                    activateGameCreator();
-                    break;
-                case 'world':
-                    activateWorldBuilder();
-                    break;
-                case 'emotion':
-                    activateEmotionMapper();
-                    break;
-                case 'chaos':
-                    activateChaosGenerator();
-                    break;
-            }
-
-            statusText.textContent = `Activated: ${toolName.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}`;
-        }
-
-        // Tool implementations
-        function activateMindMap() {
-            createFloatingIdea("Click anywhere to start your mind map!", canvas.width / 2, canvas.height / 2);
-            moodText.textContent = "Focused";
-        }
-
-        function activateStoryWeaver() {
-            createFloatingIdea("Tell me a story idea...", canvas.width / 2 - 100, canvas.height / 2);
-            createFloatingIdea("...and I'll weave it into reality", canvas.width / 2 + 100, canvas.height / 2);
-            moodText.textContent = "Imaginative";
-        }
-
-        function activateDigitalArtist() {
-            ctx.fillStyle = '#667eea';
-            ctx.font = '24px Arial';
-            ctx.fillText('🎨 Draw your vision!', canvas.width / 2 - 100, canvas.height / 2);
-            moodText.textContent = "Artistic";
-        }
-
-        function activateMusicComposer() {
-            createFloatingIdea("What mood should the music convey?", canvas.width / 2, canvas.height / 2 - 50);
-            createFloatingIdea("Click to generate musical notes!", canvas.width / 2, canvas.height / 2 + 50);
-            moodText.textContent = "Harmonious";
-        }
-
-        function activateLogicVisualizer() {
-            createFloatingIdea("Draw your logical connections", canvas.width / 2, canvas.height / 2);
-            moodText.textContent = "Analytical";
-        }
-
-        function activateProblemSolver() {
-            createFloatingIdea("Describe your problem...", canvas.width / 2 - 150, canvas.height / 2);
-            createFloatingIdea("...I'll find creative solutions!", canvas.width / 2 + 150, canvas.height / 2);
-            moodText.textContent = "Solution-oriented";
-        }
-
-        function activateDreamInterpreter() {
-            createFloatingIdea("Share your dream...", canvas.width / 2, canvas.height / 2 - 50);
-            createFloatingIdea("...I'll interpret its meaning", canvas.width / 2, canvas.height / 2 + 50);
-            moodText.textContent = "Mystical";
-        }
-
-        function activateFuturePredictor() {
-            createFloatingIdea("What future interests you?", canvas.width / 2, canvas.height / 2);
-            moodText.textContent = "Prophetic";
-        }
-
-        function activateGameCreator() {
-            createFloatingIdea("What kind of game?", canvas.width / 2 - 100, canvas.height / 2);
-            createFloatingIdea("Let's build it together!", canvas.width / 2 + 100, canvas.height / 2);
-            moodText.textContent = "Playful";
-        }
-
-        function activateWorldBuilder() {
-            createFloatingIdea("Describe your world...", canvas.width / 2, canvas.height / 2 - 50);
-            createFloatingIdea("...I'll help you build it", canvas.width / 2, canvas.height / 2 + 50);
-            moodText.textContent = "Architectural";
-        }
-
-        function activateEmotionMapper() {
-            createFloatingIdea("How are you feeling?", canvas.width / 2, canvas.height / 2);
-            moodText.textContent = "Empathetic";
-        }
-
-        function activateChaosGenerator() {
-            // Create random floating elements
-            for (let i = 0; i < 10; i++) {
-                setTimeout(() => {
-                    createFloatingIdea(
-                        aiThoughts[Math.floor(Math.random() * aiThoughts.length)],
-                        Math.random() * canvas.width,
-                        Math.random() * canvas.height
-                    );
-                }, i * 200);
-            }
-            moodText.textContent = "Chaotic";
-        }
-
-        // Floating idea creation
-        function createFloatingIdea(text, x, y) {
-            const element = document.createElement('div');
-            element.className = 'floating-element';
-            element.textContent = text;
-            element.style.left = x + 'px';
-            element.style.top = y + 'px';
-
-            element.addEventListener('click', () => {
-                element.remove();
-                createThoughtBubble(text, x, y);
-            });
-
-            floatingElements.appendChild(element);
-
-            // Auto-remove after 10 seconds
-            setTimeout(() => {
-                if (element.parentNode) {
-                    element.remove();
-                }
-            }, 10000);
-        }
-
-        // Thought bubble creation
-        function createThoughtBubble(text, x, y) {
-            const bubble = document.createElement('div');
-            bubble.className = 'thought-bubble';
-            bubble.textContent = `AI says: "${text}" - Click to explore this idea further!`;
-            bubble.style.left = (x - 125) + 'px';
-            bubble.style.top = (y - 100) + 'px';
-
-            bubble.addEventListener('click', () => {
-                bubble.classList.remove('visible');
-                setTimeout(() => bubble.remove(), 300);
-                // Generate more ideas based on the clicked thought
-                generateMoreIdeas(text, x, y);
-            });
-
-            floatingElements.appendChild(bubble);
-
-            // Show bubble with animation
-            setTimeout(() => bubble.classList.add('visible'), 100);
-
-            // Auto-hide after 8 seconds
-            setTimeout(() => {
-                if (bubble.parentNode) {
-                    bubble.classList.remove('visible');
-                    setTimeout(() => bubble.remove(), 300);
-                }
-            }, 8000);
-        }
-
-        // Generate more ideas based on user interaction
-        function generateMoreIdeas(baseIdea, x, y) {
-            const relatedIdeas = [
-                "What if we combined this with...?",
-                "This reminds me of...",
-                "Have you considered...?",
-                "Let's explore the opposite...",
-                "What would happen if...?"
-            ];
-
-            for (let i = 0; i < 3; i++) {
-                setTimeout(() => {
-                    createFloatingIdea(
-                        relatedIdeas[Math.floor(Math.random() * relatedIdeas.length)],
-                        x + (Math.random() - 0.5) * 200,
-                        y + (Math.random() - 0.5) * 200
-                    );
-                }, i * 500);
-            }
-        }
-
-        // AI autonomous behavior - spawn random thoughts
-        setInterval(() => {
-            if (Math.random() < 0.3) { // 30% chance every 5 seconds
-                createFloatingIdea(
-                    aiThoughts[Math.floor(Math.random() * aiThoughts.length)],
-                    Math.random() * canvas.width,
-                    Math.random() * canvas.height
-                );
-            }
-        }, 5000);
-
-        // Initialize with welcome message
+        // Welcome message after a short delay
         setTimeout(() => {
-            createFloatingIdea("Welcome to Somer.AI!", canvas.width / 2, canvas.height / 2);
-            createFloatingIdea("The most original AI assistant ever created", canvas.width / 2, canvas.height / 2 + 50);
-        }, 1000);
+            showStatus('Ready');
+        }, 500);
     </script>
 </body>
-</html></content>
-<parameter name="filePath">/Users/ryanroy/Desktop/coding/somer.AI.html
+</html>
