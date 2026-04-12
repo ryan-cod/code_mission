@@ -89,6 +89,44 @@
             overflow: hidden;
         }
 
+        .workspace {
+            display: flex;
+            flex: 1;
+            gap: 16px;
+            overflow: hidden;
+        }
+
+        .website-preview {
+            display: none;
+            flex-direction: column;
+            width: 45%;
+            border: 1px solid #dfe3ea;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #ffffff;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .website-preview.active {
+            display: flex;
+        }
+
+        .preview-header {
+            padding: 12px 14px;
+            font-weight: 700;
+            font-size: 14px;
+            border-bottom: 1px solid #e9ecef;
+            background: #f7f9fb;
+            color: #2c3e50;
+        }
+
+        .preview-frame {
+            flex: 1;
+            border: none;
+            width: 100%;
+            min-height: 200px;
+        }
+
         .messages {
             flex: 1;
             overflow-y: auto;
@@ -324,7 +362,8 @@
             </div>
         </div>
 
-        <div class="chat-area">
+        <div class="workspace">
+            <div class="chat-area">
             <div class="messages" id="messages">
                 <div class="welcome-message">
                     <h2>👋 Welcome to Somer.O!</h2>
@@ -347,6 +386,12 @@
                     rows="1"
                 ></textarea>
                 <button onclick="sendMessage()">Send</button>
+            </div>
+            </div>
+
+            <div class="website-preview" id="websitePreview">
+                <div class="preview-header">Website Preview</div>
+                <iframe id="previewIframe" class="preview-frame" src="about:blank"></iframe>
             </div>
         </div>
     </div>
@@ -442,6 +487,12 @@
         function generateCodingResponse(userMessage) {
             const lowerMessage = userMessage.toLowerCase();
             const selectedLanguage = languageSelect.value;
+
+            // If user specifically asks to make a website, show preview pane
+            if (lowerMessage.includes('make a website') || lowerMessage.includes('create a website') || lowerMessage.includes('build a website') || lowerMessage.includes('website')) {
+                showWebsitePreview('index.html');
+                return `✅ Great! I opened the website preview on the right. Use this assistant to refine your site copy, UI, and code (HTML/CSS/JS).`;
+            }
 
             // Code generation requests
             if (lowerMessage.includes('write') || lowerMessage.includes('create') || lowerMessage.includes('make')) {
@@ -746,6 +797,7 @@ What specific code or functionality are you trying to optimize?`;
         }
 
         function generateDefaultResponse(message, language) {
+            hideWebsitePreview();
             return `I'm here to help with your coding questions! I can assist with:
 
 **🛠️ Code Help:**
@@ -766,6 +818,20 @@ What specific code or functionality are you trying to optimize?`;
 **Current language:** ${language}
 
 What would you like to work on? Feel free to ask me anything about programming!`;
+        }
+
+        function showWebsitePreview(url) {
+            const preview = document.getElementById('websitePreview');
+            const iframe = document.getElementById('previewIframe');
+            iframe.src = url;
+            preview.classList.add('active');
+        }
+
+        function hideWebsitePreview() {
+            const preview = document.getElementById('websitePreview');
+            if (preview) {
+                preview.classList.remove('active');
+            }
         }
 
         // Initialize

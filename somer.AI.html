@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Somer.AI - The Most Original AI Assistant</title>
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23667eea' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' font-weight='bold' fill='white' text-anchor='middle'>AI</text></svg>">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 50%, #16213e 100%);
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        .sidebar {
+            width: 300px;
+            background: rgba(255, 255, 255, 0.95);
+            border-right: 1px solid #e9ecef;
+            display: flex;
+            flex-direction: column;
+            backdrop-filter: blur(10px);
+        }
+
+        .header {
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background: white;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #667eea;
+            font-size: 24px;
+            margin: 0 auto 15px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .tools {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .tool-section {
+            margin-bottom: 25px;
+        }
+
+        .tool-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 5px;
+        }
+
+        .tool-button {
+            display: block;
+            width: 100%;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-align: left;
+        }
+
+        .tool-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .tool-button.active {
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+        }
+
+        .canvas-area {
+            flex: 1;
+            position: relative;
+            background: #ffffff;
+            overflow: hidden;
+        }
+
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #f8f9fa 25%, transparent 25%),
+                        linear-gradient(-45deg, #f8f9fa 25%, transparent 25%),
+                        linear-gradient(45deg, transparent 75%, #f8f9fa 75%),
+                        linear-gradient(-45deg, transparent 75%, #f8f9fa 75%);
+            background-size: 20px 20px;
+            background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        }
+
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: crosshair;
+        }
+
+        .floating-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+
+        .floating-element {
+            position: absolute;
+            background: rgba(102, 126, 234, 0.9);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            animation: float 3s ease-in-out infinite;
+            pointer-events: auto;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .floating-element:hover {
+            transform: scale(1.05);
+            background: rgba(102, 126, 234, 1);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .ai-brain {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(102, 126, 234, 0.3) 0%, rgba(102, 126, 234, 0.1) 70%, transparent 100%);
+            animation: pulse 2s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+            50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.8; }
+        }
+
+        .thought-bubble {
+            position: absolute;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 15px;
+            padding: 15px;
+            max-width: 250px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.3s;
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
+        .thought-bubble.visible {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .thought-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 30px;
+            width: 0;
+            height: 0;
+            border-left: 10px solid transparent;
+            border-right: 10px solid transparent;
+            border-top: 10px solid #667eea;
+        }
+
+        .status-bar {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid #e9ecef;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(10px);
+        }
+
+        .status-text {
+            font-size: 14px;
+            color: #6c757d;
+        }
+
+        .ai-mood {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .mood-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #22c55e;
+            animation: mood-pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes mood-pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .mood-text {
+            font-size: 12px;
+            color: #22c55e;
+            font-weight: 500;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 200px;
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .canvas-area {
+                height: calc(100vh - 200px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="sidebar">
+            <div class="header">
+                <div class="logo">AI</div>
+                <h1>Somer.AI</h1>
+                <p>The Most Original AI</p>
+            </div>
+
+            <div class="tools">
+                <div class="tool-section">
+                    <h3>🎨 Creative Tools</h3>
+                    <button class="tool-button" onclick="activateTool('mindmap')">Mind Map Creator</button>
+                    <button class="tool-button" onclick="activateTool('story')">Story Weaver</button>
+                    <button class="tool-button" onclick="activateTool('art')">Digital Artist</button>
+                    <button class="tool-button" onclick="activateTool('music')">Music Composer</button>
+                </div>
+
+                <div class="tool-section">
+                    <h3>🧠 Thinking Tools</h3>
+                    <button class="tool-button" onclick="activateTool('logic')">Logic Visualizer</button>
+                    <button class="tool-button" onclick="activateTool('problem')">Problem Solver</button>
+                    <button class="tool-button" onclick="activateTool('dream')">Dream Interpreter</button>
+                    <button class="tool-button" onclick="activateTool('future')">Future Predictor</button>
+                </div>
+
+                <div class="tool-section">
+                    <h3>🌟 Interactive</h3>
+                    <button class="tool-button" onclick="activateTool('game')">Game Creator</button>
+                    <button class="tool-button" onclick="activateTool('world')">World Builder</button>
+                    <button class="tool-button" onclick="activateTool('emotion')">Emotion Mapper</button>
+                    <button class="tool-button" onclick="activateTool('chaos')">Chaos Generator</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="canvas-area">
+            <div class="canvas-container">
+                <canvas id="mainCanvas"></canvas>
+                <div class="ai-brain"></div>
+                <div class="floating-elements" id="floatingElements"></div>
+            </div>
+
+            <div class="status-bar">
+                <div class="status-text" id="statusText">AI is ready to create something amazing...</div>
+                <div class="ai-mood">
+                    <div class="mood-indicator"></div>
+                    <span class="mood-text" id="moodText">Creative</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const canvas = document.getElementById('mainCanvas');
+        const ctx = canvas.getContext('2d');
+        const floatingElements = document.getElementById('floatingElements');
+        const statusText = document.getElementById('statusText');
+        const moodText = document.getElementById('moodText');
+
+        let currentTool = null;
+        let isDrawing = false;
+        let lastX = 0;
+        let lastY = 0;
+        let floatingIdeas = [];
+        let aiThoughts = [
+            "What if we could fly?",
+            "Colors have emotions too",
+            "Time is just a suggestion",
+            "Dreams are reality's blueprint",
+            "Music is mathematics we can hear",
+            "Every problem has infinite solutions",
+            "Creativity is intelligence having fun",
+            "The universe is made of stories",
+            "Thoughts are living things",
+            "Imagination is the ultimate reality"
+        ];
+
+        // Initialize canvas
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // Canvas drawing functions
+        function startDrawing(e) {
+            isDrawing = true;
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+
+            ctx.beginPath();
+            ctx.moveTo(lastX, lastY);
+            ctx.lineTo(e.offsetX, e.offsetY);
+            ctx.strokeStyle = '#667eea';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+            ctx.stroke();
+
+            [lastX, lastY] = [e.offsetX, e.offsetY];
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        // Event listeners
+        canvas.addEventListener('mousedown', startDrawing);
+        canvas.addEventListener('mousemove', draw);
+        canvas.addEventListener('mouseup', stopDrawing);
+        canvas.addEventListener('mouseout', stopDrawing);
+
+        // Tool activation
+        function activateTool(toolName) {
+            currentTool = toolName;
+
+            // Update button states
+            document.querySelectorAll('.tool-button').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
+
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Activate specific tool
+            switch(toolName) {
+                case 'mindmap':
+                    activateMindMap();
+                    break;
+                case 'story':
+                    activateStoryWeaver();
+                    break;
+                case 'art':
+                    activateDigitalArtist();
+                    break;
+                case 'music':
+                    activateMusicComposer();
+                    break;
+                case 'logic':
+                    activateLogicVisualizer();
+                    break;
+                case 'problem':
+                    activateProblemSolver();
+                    break;
+                case 'dream':
+                    activateDreamInterpreter();
+                    break;
+                case 'future':
+                    activateFuturePredictor();
+                    break;
+                case 'game':
+                    activateGameCreator();
+                    break;
+                case 'world':
+                    activateWorldBuilder();
+                    break;
+                case 'emotion':
+                    activateEmotionMapper();
+                    break;
+                case 'chaos':
+                    activateChaosGenerator();
+                    break;
+            }
+
+            statusText.textContent = `Activated: ${toolName.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())}`;
+        }
+
+        // Tool implementations
+        function activateMindMap() {
+            createFloatingIdea("Click anywhere to start your mind map!", canvas.width / 2, canvas.height / 2);
+            moodText.textContent = "Focused";
+        }
+
+        function activateStoryWeaver() {
+            createFloatingIdea("Tell me a story idea...", canvas.width / 2 - 100, canvas.height / 2);
+            createFloatingIdea("...and I'll weave it into reality", canvas.width / 2 + 100, canvas.height / 2);
+            moodText.textContent = "Imaginative";
+        }
+
+        function activateDigitalArtist() {
+            ctx.fillStyle = '#667eea';
+            ctx.font = '24px Arial';
+            ctx.fillText('🎨 Draw your vision!', canvas.width / 2 - 100, canvas.height / 2);
+            moodText.textContent = "Artistic";
+        }
+
+        function activateMusicComposer() {
+            createFloatingIdea("What mood should the music convey?", canvas.width / 2, canvas.height / 2 - 50);
+            createFloatingIdea("Click to generate musical notes!", canvas.width / 2, canvas.height / 2 + 50);
+            moodText.textContent = "Harmonious";
+        }
+
+        function activateLogicVisualizer() {
+            createFloatingIdea("Draw your logical connections", canvas.width / 2, canvas.height / 2);
+            moodText.textContent = "Analytical";
+        }
+
+        function activateProblemSolver() {
+            createFloatingIdea("Describe your problem...", canvas.width / 2 - 150, canvas.height / 2);
+            createFloatingIdea("...I'll find creative solutions!", canvas.width / 2 + 150, canvas.height / 2);
+            moodText.textContent = "Solution-oriented";
+        }
+
+        function activateDreamInterpreter() {
+            createFloatingIdea("Share your dream...", canvas.width / 2, canvas.height / 2 - 50);
+            createFloatingIdea("...I'll interpret its meaning", canvas.width / 2, canvas.height / 2 + 50);
+            moodText.textContent = "Mystical";
+        }
+
+        function activateFuturePredictor() {
+            createFloatingIdea("What future interests you?", canvas.width / 2, canvas.height / 2);
+            moodText.textContent = "Prophetic";
+        }
+
+        function activateGameCreator() {
+            createFloatingIdea("What kind of game?", canvas.width / 2 - 100, canvas.height / 2);
+            createFloatingIdea("Let's build it together!", canvas.width / 2 + 100, canvas.height / 2);
+            moodText.textContent = "Playful";
+        }
+
+        function activateWorldBuilder() {
+            createFloatingIdea("Describe your world...", canvas.width / 2, canvas.height / 2 - 50);
+            createFloatingIdea("...I'll help you build it", canvas.width / 2, canvas.height / 2 + 50);
+            moodText.textContent = "Architectural";
+        }
+
+        function activateEmotionMapper() {
+            createFloatingIdea("How are you feeling?", canvas.width / 2, canvas.height / 2);
+            moodText.textContent = "Empathetic";
+        }
+
+        function activateChaosGenerator() {
+            // Create random floating elements
+            for (let i = 0; i < 10; i++) {
+                setTimeout(() => {
+                    createFloatingIdea(
+                        aiThoughts[Math.floor(Math.random() * aiThoughts.length)],
+                        Math.random() * canvas.width,
+                        Math.random() * canvas.height
+                    );
+                }, i * 200);
+            }
+            moodText.textContent = "Chaotic";
+        }
+
+        // Floating idea creation
+        function createFloatingIdea(text, x, y) {
+            const element = document.createElement('div');
+            element.className = 'floating-element';
+            element.textContent = text;
+            element.style.left = x + 'px';
+            element.style.top = y + 'px';
+
+            element.addEventListener('click', () => {
+                element.remove();
+                createThoughtBubble(text, x, y);
+            });
+
+            floatingElements.appendChild(element);
+
+            // Auto-remove after 10 seconds
+            setTimeout(() => {
+                if (element.parentNode) {
+                    element.remove();
+                }
+            }, 10000);
+        }
+
+        // Thought bubble creation
+        function createThoughtBubble(text, x, y) {
+            const bubble = document.createElement('div');
+            bubble.className = 'thought-bubble';
+            bubble.textContent = `AI says: "${text}" - Click to explore this idea further!`;
+            bubble.style.left = (x - 125) + 'px';
+            bubble.style.top = (y - 100) + 'px';
+
+            bubble.addEventListener('click', () => {
+                bubble.classList.remove('visible');
+                setTimeout(() => bubble.remove(), 300);
+                // Generate more ideas based on the clicked thought
+                generateMoreIdeas(text, x, y);
+            });
+
+            floatingElements.appendChild(bubble);
+
+            // Show bubble with animation
+            setTimeout(() => bubble.classList.add('visible'), 100);
+
+            // Auto-hide after 8 seconds
+            setTimeout(() => {
+                if (bubble.parentNode) {
+                    bubble.classList.remove('visible');
+                    setTimeout(() => bubble.remove(), 300);
+                }
+            }, 8000);
+        }
+
+        // Generate more ideas based on user interaction
+        function generateMoreIdeas(baseIdea, x, y) {
+            const relatedIdeas = [
+                "What if we combined this with...?",
+                "This reminds me of...",
+                "Have you considered...?",
+                "Let's explore the opposite...",
+                "What would happen if...?"
+            ];
+
+            for (let i = 0; i < 3; i++) {
+                setTimeout(() => {
+                    createFloatingIdea(
+                        relatedIdeas[Math.floor(Math.random() * relatedIdeas.length)],
+                        x + (Math.random() - 0.5) * 200,
+                        y + (Math.random() - 0.5) * 200
+                    );
+                }, i * 500);
+            }
+        }
+
+        // AI autonomous behavior - spawn random thoughts
+        setInterval(() => {
+            if (Math.random() < 0.3) { // 30% chance every 5 seconds
+                createFloatingIdea(
+                    aiThoughts[Math.floor(Math.random() * aiThoughts.length)],
+                    Math.random() * canvas.width,
+                    Math.random() * canvas.height
+                );
+            }
+        }, 5000);
+
+        // Initialize with welcome message
+        setTimeout(() => {
+            createFloatingIdea("Welcome to Somer.AI!", canvas.width / 2, canvas.height / 2);
+            createFloatingIdea("The most original AI assistant ever created", canvas.width / 2, canvas.height / 2 + 50);
+        }, 1000);
+    </script>
+</body>
+</html></content>
+<parameter name="filePath">/Users/ryanroy/Desktop/coding/somer.AI.html
