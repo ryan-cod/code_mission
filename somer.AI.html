@@ -495,6 +495,99 @@
                 height: calc(100vh - 200px);
             }
         }
+
+        /* Generated Images */
+        .generated-image-container {
+            margin: 16px 0;
+            max-width: 400px;
+            border-radius: 12px;
+            overflow: hidden;
+            background: #f8f9fa;
+            border: 1px solid #e1e5e9;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f3f2f1 0%, #e1e5e9 100%);
+        }
+
+        .image-loading {
+            text-align: center;
+            color: #605e5c;
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid #e1e5e9;
+            border-top: 4px solid #0059b0;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 12px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .generated-image {
+            position: relative;
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+        }
+
+        .generated-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .image-overlay {
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 8px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .generated-image:hover .image-overlay {
+            opacity: 1;
+        }
+
+        .image-action-btn {
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            transition: background 0.2s ease;
+        }
+
+        .image-action-btn:hover {
+            background: rgba(0, 0, 0, 0.9);
+        }
+
+        .image-caption {
+            padding: 12px;
+            font-size: 14px;
+            color: #323130;
+            background: white;
+            border-top: 1px solid #e1e5e9;
+        }
     </style>
 </head>
 <body>
@@ -525,6 +618,10 @@
                 <div class="tool-item" onclick="activateTool('art')">
                     <div class="tool-icon">🎨</div>
                     <span>Digital Artist</span>
+                </div>
+                <div class="tool-item" onclick="activateTool('image')">
+                    <div class="tool-icon">🖼️</div>
+                    <span>Image Generator</span>
                 </div>
                 <div class="tool-item" onclick="activateTool('music')">
                     <div class="tool-icon">🎵</div>
@@ -822,6 +919,14 @@
         function generateResponse(message) {
             const lowerMessage = message.toLowerCase();
 
+            // Check for image generation requests
+            if (lowerMessage.includes('generate') && (lowerMessage.includes('image') || lowerMessage.includes('photo') || lowerMessage.includes('picture') || lowerMessage.includes('draw') || lowerMessage.includes('create'))) {
+                setTimeout(() => {
+                    generateImage(message);
+                }, 1500);
+                return "🎨 Generating your image... This may take a few moments!";
+            }
+
             // Tool-specific responses
             if (currentTool) {
                 return generateToolResponse(message, currentTool);
@@ -829,11 +934,11 @@
 
             // General responses
             if (lowerMessage.includes('hello') || lowerMessage.includes('hi')) {
-                return "Hello! I'm Somer.AI, your intelligent companion. I can help you with creative tasks, problem-solving, storytelling, and much more. What would you like to work on today?";
+                return "Hello! I'm Somer.AI, your intelligent companion. I can help you with creative tasks, problem-solving, storytelling, image generation, and much more. What would you like to work on today?";
             }
 
             if (lowerMessage.includes('help')) {
-                return "I can assist you with:\n\n🧠 **Mind Mapping** - Visualize ideas and plan projects\n📖 **Storytelling** - Create imaginative stories\n🎨 **Digital Art** - Generate artistic concepts\n🎵 **Music** - Compose and describe music\n💡 **Problem Solving** - Find solutions to challenges\n\nChoose a tool from the sidebar or just ask me anything!";
+                return "I can assist you with:\n\n🧠 **Mind Mapping** - Visualize ideas and plan projects\n📖 **Storytelling** - Create imaginative stories\n🎨 **Digital Art** - Generate artistic concepts\n🖼️ **Image Generation** - Create AI-generated images\n🎵 **Music** - Compose and describe music\n💡 **Problem Solving** - Find solutions to challenges\n\nChoose a tool from the sidebar or just ask me anything!";
             }
 
             if (lowerMessage.includes('thank')) {
@@ -869,6 +974,11 @@
                     "Visual art is about expressing emotion through imagery. What mood or feeling would you like your artwork to convey?",
                     "Color theory plays a big role in visual impact. What colors speak to you for this piece - warm and energetic, or cool and calming?",
                     "Composition guides the viewer's eye. Let's think about focal points and balance. What should be the most prominent element?"
+                ],
+                image: [
+                    "I can generate images from your descriptions! Try prompts like 'a serene mountain landscape at sunset' or 'a futuristic city with flying cars'. What would you like me to create?",
+                    "For best results, be specific about style, lighting, mood, and subject. For example: 'oil painting of a cat wearing sunglasses, impressionist style'. What's your image idea?",
+                    "Image generation works best with detailed descriptions. Include elements like setting, lighting, colors, and style. What scene should I generate for you?"
                 ],
                 music: [
                     "Music has the power to evoke deep emotions. What feeling would you like your composition to express - joy, melancholy, energy?",
@@ -919,6 +1029,69 @@
 
             const toolResponses = responses[tool] || ["I'm ready to help with this! What specific aspect would you like to explore?"];
             return toolResponses[Math.floor(Math.random() * toolResponses.length)];
+        }
+
+        // Generate images based on user prompts
+        function generateImage(prompt) {
+            // Create image container
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'generated-image-container';
+            imageContainer.innerHTML = `
+                <div class="image-placeholder">
+                    <div class="image-loading">
+                        <div class="loading-spinner"></div>
+                        <p>Generating image...</p>
+                    </div>
+                </div>
+                <div class="image-caption">${prompt}</div>
+            `;
+
+            // Add to chat
+            const chatMessages = document.getElementById('chat-messages');
+            chatMessages.appendChild(imageContainer);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+
+            // Simulate image generation (in a real implementation, this would call an AI image API)
+            setTimeout(() => {
+                // For demo purposes, we'll use a placeholder image
+                // In production, replace this with actual API call to services like DALL-E, Midjourney, etc.
+                const placeholderImages = [
+                    'https://picsum.photos/400/300?random=1',
+                    'https://picsum.photos/400/300?random=2',
+                    'https://picsum.photos/400/300?random=3',
+                    'https://picsum.photos/400/300?random=4',
+                    'https://picsum.photos/400/300?random=5'
+                ];
+
+                const randomImage = placeholderImages[Math.floor(Math.random() * placeholderImages.length)];
+
+                imageContainer.innerHTML = `
+                    <div class="generated-image">
+                        <img src="${randomImage}" alt="${prompt}" onload="this.style.opacity='1'">
+                        <div class="image-overlay">
+                            <button class="image-action-btn" onclick="downloadImage('${randomImage}', '${prompt}')">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                                    <polyline points="7,10 12,15 17,10"></polyline>
+                                    <line x1="12" y1="15" x2="12" y2="3"></line>
+                                </svg>
+                                Download
+                            </button>
+                        </div>
+                    </div>
+                    <div class="image-caption">${prompt}</div>
+                `;
+            }, 2000); // Simulate 2-second generation time
+        }
+
+        // Download generated image
+        function downloadImage(imageUrl, prompt) {
+            const link = document.createElement('a');
+            link.href = imageUrl;
+            link.download = `somer-ai-${prompt.replace(/[^a-z0-9]/gi, '-').toLowerCase()}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         // Activate tool
