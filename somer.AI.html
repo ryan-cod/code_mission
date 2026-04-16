@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Somer.AI - Your AI Companion</title>
+    <title>Somer AI Copilot</title>
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%230059b0' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' font-weight='bold' fill='white' text-anchor='middle'>AI</text></svg>">
     <link href="https://fonts.googleapis.com/css2?family=Segoe+UI:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
@@ -13,9 +13,24 @@
             box-sizing: border-box;
         }
 
+        :root {
+            color-scheme: dark;
+            --bg: #050b16;
+            --panel: #091525;
+            --panel-strong: #0c1d33;
+            --surface: rgba(255,255,255,0.05);
+            --surface-strong: rgba(255,255,255,0.08);
+            --border: rgba(148,163,184,0.18);
+            --text: #e2e8f0;
+            --muted: #94a3b8;
+            --accent: #0ea5e9;
+            --accent-soft: rgba(14,165,233,0.16);
+        }
+
         body {
             font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: #f5f5f5;
+            background: radial-gradient(circle at top left, rgba(14,165,233,0.18), transparent 22%), linear-gradient(180deg, #020617 0%, #07101f 60%, #090f1b 100%);
+            color: var(--text);
             min-height: 100vh;
             overflow: hidden;
         }
@@ -23,75 +38,77 @@
         .app {
             display: flex;
             height: 100vh;
-            background: #ffffff;
+            min-height: 100vh;
+            background: transparent;
         }
 
         /* Sidebar */
         .sidebar {
             width: 320px;
-            background: #f8f9fa;
-            border-right: 1px solid #e1e5e9;
+            background: var(--panel);
+            border-right: 1px solid var(--border);
             display: flex;
             flex-direction: column;
             position: relative;
         }
 
         .sidebar-header {
-            padding: 24px 20px 16px;
-            border-bottom: 1px solid #e1e5e9;
-            background: linear-gradient(135deg, #0059b0 0%, #0078d4 100%);
-            color: white;
+            padding: 24px 20px 18px;
+            border-bottom: 1px solid rgba(148,163,184,0.1);
+            background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent 100%);
+            color: var(--text);
         }
 
         .logo-section {
             display: flex;
             align-items: center;
             gap: 12px;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .logo {
-            width: 40px;
-            height: 40px;
-            background: white;
-            border-radius: 8px;
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+            border-radius: 14px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: bold;
-            color: #0059b0;
+            font-weight: 700;
+            color: white;
             font-size: 18px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            box-shadow: 0 16px 35px rgba(14,165,233,0.18);
         }
 
         .brand-text h1 {
             font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 2px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            color: white;
         }
 
         .brand-text p {
             font-size: 12px;
-            opacity: 0.9;
-            font-weight: 400;
+            opacity: 0.85;
+            color: #cbd5e1;
         }
 
         .new-chat-btn {
             width: 100%;
-            padding: 8px 16px;
-            background: rgba(255,255,255,0.2);
-            border: 1px solid rgba(255,255,255,0.3);
-            border-radius: 6px;
+            padding: 12px 16px;
+            background: rgba(14,165,233,0.16);
+            border: 1px solid rgba(14,165,233,0.28);
+            border-radius: 12px;
             color: white;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             cursor: pointer;
             transition: all 0.2s;
-            margin-top: 12px;
+            margin-top: 16px;
         }
 
         .new-chat-btn:hover {
-            background: rgba(255,255,255,0.3);
+            background: rgba(14,165,233,0.24);
         }
 
         .sidebar-content {
@@ -101,11 +118,11 @@
         }
 
         .section-title {
-            font-size: 12px;
-            font-weight: 600;
-            color: #605e5c;
+            font-size: 11px;
+            font-weight: 700;
+            color: #94a3b8;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 0.18em;
             margin-bottom: 12px;
             margin-top: 20px;
         }
@@ -118,88 +135,110 @@
             display: flex;
             align-items: center;
             gap: 12px;
-            padding: 10px 12px;
-            border-radius: 6px;
+            padding: 14px 14px;
+            border-radius: 14px;
             cursor: pointer;
             transition: all 0.2s;
-            margin-bottom: 4px;
+            margin-bottom: 8px;
             font-size: 14px;
-            font-weight: 400;
-            color: #323130;
+            font-weight: 500;
+            color: var(--text);
+            background: rgba(255,255,255,0.02);
+            border: 1px solid transparent;
         }
 
         .tool-item:hover {
-            background: #e1e5e9;
+            background: rgba(255,255,255,0.08);
         }
 
         .tool-item.active {
-            background: #0059b0;
-            color: white;
+            background: rgba(14,165,233,0.16);
+            border-color: rgba(14,165,233,0.28);
         }
 
         .tool-icon {
-            width: 20px;
-            height: 20px;
+            width: 34px;
+            height: 34px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 16px;
+            background: rgba(255,255,255,0.05);
+            color: #7dd3fc;
         }
 
-        /* Main Chat Area */
         .main-content {
             flex: 1;
             display: flex;
             flex-direction: column;
-            background: #ffffff;
+            background: rgba(255,255,255,0.03);
+            backdrop-filter: blur(16px);
         }
 
+        /* Main Chat Area */
         .chat-header {
-            padding: 16px 24px;
-            border-bottom: 1px solid #e1e5e9;
-            background: #ffffff;
+            padding: 24px 28px;
+            border-bottom: 1px solid rgba(148,163,184,0.12);
+            background: rgba(255,255,255,0.04);
             display: flex;
             align-items: center;
             justify-content: space-between;
         }
 
         .chat-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #323130;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            color: white;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .chat-title span {
+            color: #94a3b8;
+            font-size: 12px;
+            font-weight: 400;
         }
 
         .audio-controls {
             display: flex;
-            gap: 8px;
+            gap: 10px;
+            align-items: center;
         }
 
         .audio-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            border: none;
-            background: #f3f2f1;
-            color: #605e5c;
+            min-width: 120px;
+            height: 42px;
+            border-radius: 999px;
+            border: 1px solid rgba(148,163,184,0.16);
+            background: rgba(255,255,255,0.08);
+            color: #e2e8f0;
             cursor: pointer;
-            display: flex;
+            display: inline-flex;
             align-items: center;
             justify-content: center;
+            gap: 10px;
+            padding: 0 16px;
             font-size: 14px;
-            transition: all 0.2s;
+            font-weight: 600;
+            transition: transform 0.2s, background 0.2s, border-color 0.2s;
         }
 
         .audio-btn:hover {
-            background: #e1e5e9;
+            background: rgba(255,255,255,0.14);
+            transform: translateY(-1px);
         }
 
         .audio-btn.active {
-            background: #0059b0;
+            background: linear-gradient(135deg, rgba(14,165,233,0.32), rgba(59,130,246,0.22));
+            border-color: rgba(14,165,233,0.45);
             color: white;
+            box-shadow: 0 12px 30px rgba(14,165,233,0.18);
         }
 
         .audio-btn.recording {
-            background: #d13438;
+            background: linear-gradient(135deg, #ef4444, #f97316);
             color: white;
             animation: pulse 1.5s infinite;
         }
@@ -212,10 +251,10 @@
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 24px;
+            padding: 24px 28px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 18px;
         }
 
         .message {
@@ -229,39 +268,43 @@
             flex-direction: row-reverse;
         }
 
+
         .message-avatar {
-            width: 32px;
-            height: 32px;
+            width: 34px;
+            height: 34px;
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 14px;
-            font-weight: 600;
+            font-size: 13px;
+            font-weight: 700;
             flex-shrink: 0;
+            background: rgba(255,255,255,0.06);
+            color: #cbd5e1;
         }
 
         .message.user .message-avatar {
-            background: #0059b0;
+            background: linear-gradient(135deg, #0ea5e9, #2563eb);
             color: white;
         }
 
         .message.bot .message-avatar {
-            background: #f3f2f1;
-            color: #605e5c;
+            background: rgba(255,255,255,0.08);
+            color: #cbd5e1;
         }
 
         .message-content {
-            background: #f3f2f1;
-            padding: 12px 16px;
-            border-radius: 16px;
+            background: rgba(255,255,255,0.05);
+            padding: 16px 18px;
+            border-radius: 20px;
             font-size: 14px;
-            line-height: 1.4;
-            color: #323130;
+            line-height: 1.6;
+            color: #e2e8f0;
+            box-shadow: 0 18px 40px rgba(0,0,0,0.1);
         }
 
         .message.user .message-content {
-            background: #0059b0;
+            background: linear-gradient(135deg, #0ea5e9, #2563eb);
             color: white;
         }
 
@@ -275,12 +318,11 @@
 
         .typing-indicator {
             display: none;
-            padding: 12px 16px;
-            background: #f3f2f1;
-            border-radius: 16px;
-            border-bottom-left-radius: 4px;
+            padding: 14px 18px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 20px;
             font-size: 14px;
-            color: #605e5c;
+            color: #94a3b8;
             align-self: flex-start;
         }
 
@@ -289,74 +331,239 @@
         }
 
         .chat-input-area {
-            padding: 20px 24px;
-            border-top: 1px solid #e1e5e9;
-            background: #ffffff;
+            padding: 18px 28px;
+            border-top: 1px solid rgba(148,163,184,0.1);
+            background: rgba(255,255,255,0.02);
+            position: relative;
         }
 
         .input-container {
             display: flex;
             gap: 12px;
-            align-items: flex-end;
+            align-items: center;
             max-width: 800px;
             margin: 0 auto;
+            position: relative;
         }
 
         .chat-input {
             flex: 1;
-            padding: 12px 16px;
-            border: 1px solid #e1e5e9;
-            border-radius: 20px;
-            font-size: 14px;
+            padding: 16px 18px 16px 60px;
+            border: 1px solid rgba(148,163,184,0.16);
+            border-radius: 16px;
+            background: rgba(255,255,255,0.05);
+            color: #e2e8f0;
+            font-size: 15px;
             font-family: inherit;
             outline: none;
             resize: none;
-            min-height: 20px;
-            max-height: 100px;
-            transition: border-color 0.2s;
+            min-height: 44px;
+            max-height: 140px;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
+        }
+
+        .chat-input::placeholder {
+            color: #94a3b8;
+        }
+
+        .talk-mode-btn {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid rgba(148,163,184,0.16);
+            background: rgba(255,255,255,0.08);
+            color: #e2e8f0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s, border-color 0.2s;
+            z-index: 1;
+        }
+
+        .talk-mode-btn:hover {
+            background: rgba(255,255,255,0.14);
+            transform: translateY(-50%) scale(1.04);
+        }
+
+        .talk-mode-btn.active {
+            background: linear-gradient(135deg, rgba(14,165,233,0.3), rgba(59,130,246,0.2));
+            border-color: rgba(14,165,233,0.45);
+            color: white;
+            box-shadow: 0 18px 35px rgba(14,165,233,0.15);
+        }
+
+        .voice-avatar {
+            position: absolute;
+            right: 22px;
+            bottom: calc(100% + 10px);
+            width: 76px;
+            height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            pointer-events: none;
+            transition: transform 0.3s ease;
+            z-index: 2;
+        }
+
+        .voice-avatar.hidden {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(20px);
+        }
+
+        .voice-blob {
+            width: 76px;
+            height: 76px;
+            border-radius: 50%;
+            background: radial-gradient(circle at top left, rgba(56,189,248,0.35), rgba(14,165,233,0.18));
+            box-shadow: 0 24px 40px rgba(14,165,233,0.18);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        .voice-blob::before,
+        .voice-blob::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            filter: blur(1px);
+        }
+
+        .voice-blob::before {
+            width: 24px;
+            height: 24px;
+            top: 10px;
+            left: 8px;
+        }
+
+        .voice-blob::after {
+            width: 18px;
+            height: 18px;
+            bottom: 8px;
+            right: 10px;
+        }
+
+        .voice-face {
+            position: relative;
+            width: 48px;
+            height: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .voice-eyes {
+            display: flex;
+            gap: 8px;
+        }
+
+        .voice-eye {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: white;
+            animation: blink 4s infinite ease-in-out;
+        }
+
+        .voice-mouth {
+            width: 18px;
+            height: 10px;
+            border-radius: 999px;
+            background: rgba(255,255,255,0.9);
+            transition: transform 0.2s ease, width 0.2s ease, height 0.2s ease;
+        }
+
+        .voice-avatar.speaking .voice-mouth {
+            transform: scale(1.2, 0.7);
+            width: 24px;
+            height: 14px;
+            background: rgba(255,255,255,1);
+        }
+
+        .voice-avatar.listening .voice-mouth {
+            transform: scale(0.95, 0.6);
+            background: rgba(255,255,255,0.85);
+        }
+
+        .voice-avatar.happy .voice-mouth {
+            width: 22px;
+            height: 8px;
+            border-radius: 999px / 200%;
+            background: transparent;
+            box-shadow: inset 0 4px 0 rgba(255,255,255,0.95);
+        }
+
+        .voice-avatar.emotion-strong .voice-eye {
+            transform: scale(1.2);
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        @keyframes blink {
+            0%, 90%, 100% { height: 8px; }
+            92%, 98% { height: 2px; }
         }
 
         .chat-input:focus {
-            border-color: #0059b0;
-            box-shadow: 0 0 0 1px #0059b0;
+            border-color: rgba(14,165,233,0.5);
+            background: rgba(255,255,255,0.08);
+            box-shadow: 0 0 0 1px rgba(14,165,233,0.18);
         }
 
         .send-btn {
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            background: #0059b0;
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: #0ea5e9;
             border: none;
             color: white;
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 16px;
-            transition: all 0.2s;
+            font-size: 18px;
+            transition: transform 0.2s, background 0.2s;
         }
 
         .send-btn:hover {
-            background: #004c99;
-            transform: scale(1.05);
+            background: #0284c7;
+            transform: translateY(-1px);
         }
 
         .send-btn:active {
-            transform: scale(0.95);
+            transform: translateY(0);
         }
 
         /* Audio Visualizer */
         .audio-visualizer {
             position: fixed;
-            bottom: 100px;
-            right: 24px;
-            width: 200px;
-            height: 40px;
-            background: rgba(0,0,0,0.8);
-            border-radius: 20px;
-            padding: 8px 16px;
+            bottom: 96px;
+            right: 22px;
+            width: 220px;
+            min-height: 48px;
+            background: rgba(15,23,42,0.94);
+            border: 1px solid rgba(14,165,233,0.2);
+            border-radius: 22px;
+            padding: 10px 16px;
             display: none;
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(20px);
+            box-shadow: 0 22px 45px rgba(0,0,0,0.25);
         }
 
         .audio-visualizer.active {
@@ -372,8 +579,8 @@
         }
 
         .bar {
-            width: 3px;
-            background: #00cc44;
+            width: 4px;
+            background: linear-gradient(180deg, #38bdf8 0%, #0ea5e9 100%);
             border-radius: 2px;
             transition: height 0.1s;
         }
@@ -386,36 +593,36 @@
             justify-content: center;
             height: 100%;
             text-align: center;
-            padding: 40px;
+            padding: 36px;
+            gap: 18px;
         }
 
         .welcome-icon {
             width: 80px;
             height: 80px;
-            background: linear-gradient(135deg, #0059b0 0%, #0078d4 100%);
-            border-radius: 20px;
+            background: linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%);
+            border-radius: 22px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 36px;
+            font-size: 34px;
             color: white;
-            margin-bottom: 24px;
-            box-shadow: 0 8px 24px rgba(0,89,176,0.3);
+            box-shadow: 0 16px 35px rgba(14,165,233,0.22);
         }
 
         .welcome-title {
             font-size: 32px;
-            font-weight: 600;
-            color: #323130;
-            margin-bottom: 8px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 4px;
         }
 
         .welcome-subtitle {
-            font-size: 16px;
-            color: #605e5c;
-            margin-bottom: 32px;
-            max-width: 400px;
-            line-height: 1.5;
+            font-size: 15px;
+            color: #94a3b8;
+            margin-bottom: 28px;
+            max-width: 440px;
+            line-height: 1.6;
         }
 
         .suggestion-grid {
@@ -427,37 +634,37 @@
         }
 
         .suggestion-card {
-            padding: 16px;
-            background: #f8f9fa;
-            border: 1px solid #e1e5e9;
-            border-radius: 8px;
+            padding: 18px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(148,163,184,0.12);
+            border-radius: 18px;
             cursor: pointer;
             transition: all 0.2s;
             text-align: left;
         }
 
         .suggestion-card:hover {
-            background: #f3f2f1;
-            border-color: #0059b0;
-            transform: translateY(-2px);
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-1px);
+            border-color: rgba(14,165,233,0.24);
         }
 
         .suggestion-icon {
-            font-size: 20px;
-            margin-bottom: 8px;
+            font-size: 18px;
+            margin-bottom: 10px;
         }
 
         .suggestion-title {
             font-size: 14px;
-            font-weight: 600;
-            color: #323130;
-            margin-bottom: 4px;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 6px;
         }
 
         .suggestion-desc {
-            font-size: 12px;
-            color: #605e5c;
-            line-height: 1.3;
+            font-size: 13px;
+            color: #94a3b8;
+            line-height: 1.4;
         }
 
         /* Responsive */
@@ -502,8 +709,8 @@
             max-width: 400px;
             border-radius: 12px;
             overflow: hidden;
-            background: #f8f9fa;
-            border: 1px solid #e1e5e9;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(148,163,184,0.12);
         }
 
         .image-placeholder {
@@ -512,18 +719,18 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            background: linear-gradient(135deg, #f3f2f1 0%, #e1e5e9 100%);
+            background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.12) 100%);
         }
 
         .image-loading {
             text-align: center;
-            color: #605e5c;
+            color: #94a3b8;
         }
 
         .loading-spinner {
             width: 40px;
             height: 40px;
-            border: 4px solid #e1e5e9;
+            border: 4px solid rgba(148,163,184,0.16);
             border-top: 4px solid #0059b0;
             border-radius: 50%;
             animation: spin 1s linear infinite;
@@ -584,9 +791,9 @@
         .image-caption {
             padding: 12px;
             font-size: 14px;
-            color: #323130;
-            background: white;
-            border-top: 1px solid #e1e5e9;
+            color: #e2e8f0;
+            background: rgba(255,255,255,0.04);
+            border-top: 1px solid rgba(148,163,184,0.12);
         }
     </style>
 </head>
@@ -599,7 +806,7 @@
                     <div class="logo">AI</div>
                     <div class="brand-text">
                         <h1>Somer.AI</h1>
-                        <p>Your AI Companion</p>
+                        <p>Your AI Copilot</p>
                     </div>
                 </div>
                 <button class="new-chat-btn" onclick="startNewChat()">+ New chat</button>
@@ -607,61 +814,61 @@
 
             <div class="sidebar-content">
                 <div class="section-title">Creative Tools</div>
-                <div class="tool-item" onclick="activateTool('mindmap')">
+                <div class="tool-item" data-tool="mindmap" onclick="activateTool('mindmap')">
                     <div class="tool-icon">🧠</div>
-                    <span>Mind Map Creator</span>
+                    <span>Brainstorm</span>
                 </div>
-                <div class="tool-item" onclick="activateTool('story')">
-                    <div class="tool-icon">📖</div>
-                    <span>Story Weaver</span>
+                <div class="tool-item" data-tool="story" onclick="activateTool('story')">
+                    <div class="tool-icon">✍️</div>
+                    <span>Compose</span>
                 </div>
-                <div class="tool-item" onclick="activateTool('art')">
+                <div class="tool-item" data-tool="art" onclick="activateTool('art')">
                     <div class="tool-icon">🎨</div>
-                    <span>Digital Artist</span>
+                    <span>Design</span>
                 </div>
-                <div class="tool-item" onclick="activateTool('image')">
+                <div class="tool-item" data-tool="image" onclick="activateTool('image')">
                     <div class="tool-icon">🖼️</div>
-                    <span>Image Generator</span>
+                    <span>Generate Image</span>
                 </div>
-                <div class="tool-item" onclick="activateTool('music')">
+                <div class="tool-item" data-tool="music" onclick="activateTool('music')">
                     <div class="tool-icon">🎵</div>
-                    <span>Music Composer</span>
+                    <span>Create Music</span>
                 </div>
 
                 <div class="section-title">Thinking Tools</div>
-                <div class="tool-item" onclick="activateTool('logic')">
+                <div class="tool-item" data-tool="logic" onclick="activateTool('logic')">
                     <div class="tool-icon">🔍</div>
-                    <span>Logic Visualizer</span>
+                    <span>Analyze</span>
                 </div>
-                <div class="tool-item" onclick="activateTool('problem')">
+                <div class="tool-item" data-tool="problem" onclick="activateTool('problem')">
                     <div class="tool-icon">💡</div>
-                    <span>Problem Solver</span>
+                    <span>Solve</span>
                 </div>
-                <div class="tool-item" onclick="activateTool('dream')">
+                <div class="tool-item" data-tool="dream" onclick="activateTool('dream')">
                     <div class="tool-icon">🌙</div>
-                    <span>Dream Interpreter</span>
+                    <span>Dream Insights</span>
                 </div>
-                <div class="tool-item" onclick="activateTool('future')">
+                <div class="tool-item" data-tool="future" onclick="activateTool('future')">
                     <div class="tool-icon">🔮</div>
-                    <span>Future Predictor</span>
+                    <span>Forecast</span>
                 </div>
 
                 <div class="section-title">Interactive</div>
-                <div class="tool-item" onclick="activateTool('game')">
+                <div class="tool-item" data-tool="game" onclick="activateTool('game')">
                     <div class="tool-icon">🎮</div>
-                    <span>Game Creator</span>
+                    <span>Build</span>
                 </div>
-                <div class="tool-item" onclick="activateTool('world')">
+                <div class="tool-item" data-tool="world" onclick="activateTool('world')">
                     <div class="tool-icon">🌍</div>
-                    <span>World Builder</span>
+                    <span>World</span>
                 </div>
-                <div class="tool-item" onclick="activateTool('emotion')">
+                <div class="tool-item" data-tool="emotion" onclick="activateTool('emotion')">
                     <div class="tool-icon">❤️</div>
-                    <span>Emotion Mapper</span>
+                    <span>Reflect</span>
                 </div>
-                <div class="tool-item" onclick="activateTool('chaos')">
+                <div class="tool-item" data-tool="chaos" onclick="activateTool('chaos')">
                     <div class="tool-icon">🎲</div>
-                    <span>Chaos Generator</span>
+                    <span>Explore</span>
                 </div>
             </div>
         </div>
@@ -669,10 +876,19 @@
         <!-- Main Content -->
         <div class="main-content">
             <div class="chat-header">
-                <div class="chat-title">Chat</div>
+                <div class="chat-title">
+                    <span>Somer AI Copilot</span>
+                    <span>Ask anything, get intelligent guidance.</span>
+                </div>
                 <div class="audio-controls">
-                    <button class="audio-btn" id="micBtn" title="Voice Input">🎤</button>
-                    <button class="audio-btn" id="speakBtn" title="Text-to-Speech">🔊</button>
+                    <button class="audio-btn" id="micBtn" title="Voice Input">
+                        <span>🎤</span>
+                        <span>Talk</span>
+                    </button>
+                    <button class="audio-btn" id="speakBtn" title="Text-to-Speech">
+                        <span>🔊</span>
+                        <span>Read</span>
+                    </button>
                 </div>
             </div>
 
@@ -680,20 +896,20 @@
                 <div class="welcome-screen">
                     <div class="welcome-icon">AI</div>
                     <h2 class="welcome-title">Hello! I'm Somer.AI</h2>
-                    <p class="welcome-subtitle">Your intelligent companion for creativity, problem-solving, and conversation. Choose a tool or start chatting!</p>
+                        <p class="welcome-subtitle">Your intelligent Copilot for creativity, productivity, and conversation. Choose a tool or start chatting!</p>
 
                     <div class="suggestion-grid">
-                        <div class="suggestion-card" onclick="sendQuickMessage('Create a mind map for project planning')">
+                        <div class="suggestion-card" onclick="sendQuickMessage('Help me brainstorm a new project idea')">
                             <div class="suggestion-icon">🧠</div>
                             <div class="suggestion-title">Mind Map</div>
                             <div class="suggestion-desc">Visualize ideas and plan projects</div>
                         </div>
-                        <div class="suggestion-card" onclick="sendQuickMessage('Tell me a creative story')">
+                        <div class="suggestion-card" onclick="sendQuickMessage('Write a creative story about a futuristic city')">
                             <div class="suggestion-icon">📖</div>
                             <div class="suggestion-title">Story Time</div>
                             <div class="suggestion-desc">Generate imaginative stories</div>
                         </div>
-                        <div class="suggestion-card" onclick="sendQuickMessage('Help me solve this problem')">
+                        <div class="suggestion-card" onclick="sendQuickMessage('Help me solve a tricky challenge at work')">
                             <div class="suggestion-icon">💡</div>
                             <div class="suggestion-title">Problem Solver</div>
                             <div class="suggestion-desc">Find solutions to challenges</div>
@@ -711,6 +927,7 @@
 
             <div class="chat-input-area">
                 <div class="input-container">
+                    <button class="talk-mode-btn" id="talkBtn" title="Audio Talk Mode">🎙️</button>
                     <textarea
                         class="chat-input"
                         id="userInput"
@@ -718,6 +935,17 @@
                         rows="1"
                     ></textarea>
                     <button class="send-btn" onclick="sendMessage()">➤</button>
+                </div>
+                <div class="voice-avatar hidden" id="voiceAvatar">
+                    <div class="voice-blob">
+                        <div class="voice-face">
+                            <div class="voice-eyes">
+                                <div class="voice-eye"></div>
+                                <div class="voice-eye"></div>
+                            </div>
+                            <div class="voice-mouth"></div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -739,6 +967,8 @@
         const typingIndicator = document.getElementById('typing');
         const micBtn = document.getElementById('micBtn');
         const speakBtn = document.getElementById('speakBtn');
+        const talkBtn = document.getElementById('talkBtn');
+        const voiceAvatar = document.getElementById('voiceAvatar');
         const audioVisualizer = document.getElementById('audioVisualizer');
 
         let currentTool = null;
@@ -749,6 +979,7 @@
         let audioContext = null;
         let analyser = null;
         let animationFrame = null;
+        let voiceState = 'idle';
 
         // Initialize audio
         function initAudio() {
@@ -759,6 +990,41 @@
             } catch (e) {
                 console.log('Audio context not supported');
             }
+        }
+
+        function setVoiceState(state) {
+            voiceState = state;
+            voiceAvatar.classList.remove('hidden', 'listening', 'speaking', 'happy', 'emotion-strong');
+            if (state === 'listening') {
+                voiceAvatar.classList.add('listening');
+                talkBtn.classList.add('active');
+                voiceAvatar.classList.remove('hidden');
+            } else if (state === 'speaking') {
+                voiceAvatar.classList.add('speaking');
+                voiceAvatar.classList.add('happy');
+                voiceAvatar.classList.add('emotion-strong');
+                voiceAvatar.classList.remove('hidden');
+            } else {
+                talkBtn.classList.remove('active');
+                voiceAvatar.classList.add('hidden');
+            }
+        }
+
+        function speakResponse(text) {
+            if (!speechSynthesis) return;
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.voice = speechSynthesis.getVoices().find(v => v.lang.includes('en')) || null;
+            utterance.rate = 1;
+            utterance.pitch = 1.05;
+            utterance.onstart = () => {
+                setVoiceState('speaking');
+            };
+            utterance.onend = () => {
+                if (!isListening) {
+                    setVoiceState('idle');
+                }
+            };
+            speechSynthesis.speak(utterance);
         }
 
         // Speech Recognition
@@ -773,7 +1039,9 @@
                 recognition.onstart = function() {
                     isListening = true;
                     micBtn.classList.add('recording');
+                    talkBtn.classList.add('active');
                     showStatus('Listening...');
+                    setVoiceState('listening');
                 };
 
                 recognition.onresult = function(event) {
@@ -786,11 +1054,16 @@
                     isListening = false;
                     micBtn.classList.remove('recording');
                     showStatus('Ready');
+                    talkBtn.classList.remove('active');
+                    if (!isSpeaking) {
+                        setVoiceState('idle');
+                    }
                 };
 
                 recognition.onerror = function(event) {
                     console.error('Speech recognition error:', event.error);
                     showStatus('Voice recognition error');
+                    setVoiceState('idle');
                 };
             }
         }
@@ -1047,7 +1320,7 @@
             `;
 
             // Add to chat
-            const chatMessages = document.getElementById('chat-messages');
+            const chatMessages = document.getElementById('messages');
             chatMessages.appendChild(imageContainer);
             chatMessages.scrollTop = chatMessages.scrollHeight;
 
@@ -1101,7 +1374,7 @@
             // Update UI
             document.querySelectorAll('.tool-item').forEach(item => {
                 item.classList.remove('active');
-                if (item.textContent.toLowerCase().includes(toolName)) {
+                if (item.dataset.tool === toolName) {
                     item.classList.add('active');
                 }
             });
@@ -1143,6 +1416,18 @@
             }
         });
 
+        talkBtn.addEventListener('click', function() {
+            if (!recognition) {
+                initSpeechRecognition();
+            }
+
+            if (isListening) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        });
+
         speakBtn.addEventListener('click', function() {
             isSpeaking = !isSpeaking;
             speakBtn.classList.toggle('active');
@@ -1151,6 +1436,9 @@
                 speakResponse("Voice synthesis activated. I'll now speak my responses!");
             } else {
                 speechSynthesis.cancel();
+                if (!isListening) {
+                    setVoiceState('idle');
+                }
             }
         });
 
