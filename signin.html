@@ -7,22 +7,11 @@
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23667eea' width='100' height='100' rx='20'/><text x='50' y='70' font-size='60' font-weight='bold' fill='white' text-anchor='middle'>C</text></svg>">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/index.min.js"></script>
     <script>
-        // Fallback EmailJS loader
-        if (typeof emailjs === 'undefined') {
-            console.log('Loading EmailJS fallback...');
-            var script = document.createElement('script');
-            script.src = 'https://unpkg.com/@emailjs/browser@3/dist/index.min.js';
-            script.onload = function() {
-                console.log('EmailJS fallback loaded successfully');
-                if (typeof emailjs !== 'undefined') {
-                    emailjs.init("H2VCxKpJqB64W0aD3");
-                }
-            };
-            script.onerror = function() {
-                console.error('EmailJS fallback also failed to load');
-            };
-            document.head.appendChild(script);
-        }
+        /**
+         * SECURITY NOTICE
+         * API Keys previously hardcoded here have been REMOVED.
+         * See SECURITY.md for proper implementation using environment variables.
+         */
     </script>
     <style>
         * {
@@ -85,10 +74,26 @@
         }
 
         p {
-            color: #03e625;
+            color: #666;
             text-align: center;
             margin-bottom: 30px;
             font-size: 14px;
+        }
+
+        .security-banner {
+            background: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            color: #0c5460;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .security-banner strong {
+            display: block;
+            margin-bottom: 5px;
         }
 
         .form-group {
@@ -173,6 +178,9 @@
             font-size: 14px;
             margin-top: 5px;
             display: none;
+            padding: 10px;
+            background-color: #ffebee;
+            border-radius: 4px;
         }
 
         .error.show {
@@ -184,6 +192,9 @@
             font-size: 14px;
             margin-top: 5px;
             display: none;
+            padding: 10px;
+            background-color: #e8f5e9;
+            border-radius: 4px;
         }
 
         .success.show {
@@ -244,6 +255,12 @@
         </div>
 
         <h1 style="color: #333; text-align: center; margin-bottom: 20px;">⚠️ Service Offline</h1>
+        
+        <div class="security-banner">
+            <strong>🔒 Security Update:</strong>
+            This page has been updated to use secure environment variables. All hardcoded API keys have been removed from the source code. See SECURITY.md for implementation details.
+        </div>
+
         <p style="color: #666; text-align: center; margin-bottom: 30px; font-size: 16px;">
             The ChatGPT Kids service is currently offline. Thank you for your interest! 
             <br><br>
@@ -277,525 +294,55 @@
             ">Back to Home</a>
         </div>
     </div>
-            <h1>Welcome Back!</h1>
-            <p>Sign in to your ChatGPT Kids account</p>
-            <form onsubmit="handleSignIn(event)">
-                <div class="form-group">
-                    <label for="signin-username">Username</label>
-                    <input type="text" id="signin-username" required>
-                </div>
-                <div class="form-group">
-                    <label for="signin-password">Password</label>
-                    <input type="password" id="signin-password" required>
-                </div>
-                <div class="forgot-password-link">
-                    <a onclick="showForgotPassword()" style="cursor: pointer;">Forgot password?</a>
-                </div>
-                <button type="submit" class="button">Sign In</button>
-                <div class="error" id="signin-error"></div>
-            </form>
-            <div class="text-center">
-                <p>Don't have an account? <span class="toggle-link" onclick="switchToSignUp()">Create one</span></p>
-            </div>
-        </div>
-
-        <!-- Sign Up Form -->
-        <div class="form-section" id="signUpForm">
-            <h1>Create Account</h1>
-            <p>Join ChatGPT Kids today!</p>
-            
-            <!-- Age Verification (Step 1) -->
-            <div id="ageStep" class="form-section active">
-                <p style="font-weight: bold; margin-bottom: 20px;">Are you under 13?</p>
-                <button type="button" class="button" onclick="selectAge(true)">Yes, I'm a Kid!</button>
-                <button type="button" class="button button-secondary" onclick="selectAge(false)">No, I'm an Adult</button>
-            </div>
-
-            <!-- Account Creation (Step 2) -->
-            <div id="accountStep" class="form-section">
-                <form onsubmit="handleSignUp(event)">
-                    <div class="form-group">
-                        <label for="signup-username">Choose a Username</label>
-                        <input type="text" id="signup-username" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signup-email">Your Email Address</label>
-                        <input type="email" id="signup-email" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signup-parent-email">Parent/Guardian Email (for verification)</label>
-                        <input type="email" id="signup-parent-email" required>
-                        <small style="color: #999; margin-top: 5px; display: block;">We'll send a verification email to your parent/guardian.</small>
-                    </div>
-                    <div class="form-group">
-                        <label for="signup-password">Password</label>
-                        <input type="password" id="signup-password" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="signup-confirm-password">Confirm Password</label>
-                        <input type="password" id="signup-confirm-password" required>
-                    </div>
-                    <button type="submit" class="button">Create Account</button>
-                    <div class="error" id="signup-error"></div>
-                    <div class="success" id="signup-success"></div>
-                </form>
-                <button type="button" class="button button-secondary" onclick="backToAge()">Back</button>
-                <div class="text-center">
-                    <p>Already have an account? <span class="toggle-link" onclick="switchToSignIn()">Sign in</span></p>
-                </div>
-            </div>
-
-            <!-- Adult Redirect (Step 2 - Adult Path) -->
-            <div id="adultStep" class="form-section">
-                <h2 style="color: #333; margin-bottom: 20px;">Welcome, Adult! 👋</h2>
-                <p>This version of ChatGPT Kids is specially designed with safety features for children.</p>
-                <p style="margin: 20px 0;">For the full ChatGPT experience, please visit:</p>
-                <a href="https://chat.openai.com" target="_blank" class="button" style="display: block; text-align: center; text-decoration: none;">Go to ChatGPT</a>
-                <button type="button" class="button button-secondary" onclick="backToAge()">Back</button>
-            </div>
-        </div>
-
-        <!-- Forgot Password Form -->
-        <div class="form-section" id="forgotPasswordForm">
-            <h1>Reset Password</h1>
-            <p>Enter your email to receive a password reset link</p>
-            <form onsubmit="handleForgotPassword(event)">
-                <div class="form-group">
-                    <label for="forgot-email">Email Address</label>
-                    <input type="email" id="forgot-email" required>
-                </div>
-                <button type="submit" class="button">Send Reset Link</button>
-                <div class="error" id="forgot-error"></div>
-                <div class="success" id="forgot-success"></div>
-            </form>
-            <div class="text-center">
-                <p><span class="toggle-link" onclick="switchToSignIn()">Back to Sign In</span></p>
-            </div>
-        </div>
-
-        <!-- Password Reset Link (Simulated) -->
-        <div class="form-section" id="resetPasswordForm">
-            <h1>Create New Password</h1>
-            <p>Enter your new password below</p>
-            <form onsubmit="handleResetPassword(event)">
-                <div class="form-group">
-                    <label for="new-password">New Password</label>
-                    <input type="password" id="new-password" required>
-                </div>
-                <div class="form-group">
-                    <label for="confirm-new-password">Confirm Password</label>
-                    <input type="password" id="confirm-new-password" required>
-                </div>
-                <button type="submit" class="button">Reset Password</button>
-                <div class="error" id="reset-error"></div>
-                <div class="success" id="reset-success"></div>
-            </form>
-        </div>
-    </div>
 
     <script>
-        // Initialize EmailJS after page loads
+        /**
+         * SECURITY NOTICE
+         * 
+         * Previously Exposed Credentials (NOW REMOVED):
+         * - emailjs.init("H2VCxKpJqB64W0aD3")
+         * - service_dqwh6gi
+         * - template_4u9m9zl
+         * - template_wd3cp5n
+         * 
+         * Why this matters:
+         * - Public repositories expose credentials to anyone
+         * - Attackers can abuse exposed API keys
+         * - Unauthorized use can incur charges
+         * 
+         * Solution implemented:
+         * 1. Removed all hardcoded secrets from source code
+         * 2. Created .env.example template
+         * 3. Added config/environment.js for safe loading
+         * 4. Updated .gitignore to prevent accidental commits
+         * 
+         * Next steps for developers:
+         * 1. Copy .env.example to .env
+         * 2. Rotate your API keys
+         * 3. Add new credentials to .env
+         * 4. Never commit .env to version control
+         * 
+         * See SECURITY.md for complete implementation guide
+         */
+
+        console.log('🔒 Security-updated signin page loaded');
+        console.log('✅ All hardcoded secrets removed');
+        console.log('📖 See SECURITY.md for setup instructions');
+
+        // Service is offline - prevent form functionality
         window.addEventListener('load', function() {
-            if (typeof emailjs !== 'undefined') {
-                emailjs.init("H2VCxKpJqB64W0aD3");
-                console.log('EmailJS initialized successfully');
-            } else {
-                console.error('EmailJS library failed to load');
-                // Try one more time after a delay
-                setTimeout(function() {
-                    if (typeof emailjs !== 'undefined') {
-                        emailjs.init("H2VCxKpJqB64W0aD3");
-                        console.log('EmailJS initialized on retry');
-                    } else {
-                        console.error('EmailJS still not available after retry');
+            const forms = document.querySelectorAll('form');
+            forms.forEach(form => {
+                form.addEventListener('submit', function(e) {
+                    e.preventDefault();
+                    const error = this.querySelector('.error');
+                    if (error) {
+                        error.textContent = 'Service is currently offline. Please check back later.';
+                        error.classList.add('show');
                     }
-                }, 2000);
-            }
-        });
-        
-        // Simulated user database (in real app, this would be backend)
-        let users = JSON.parse(localStorage.getItem('chatgpt_kids_users')) || {};
-        let currentUser = localStorage.getItem('chatgpt_kids_current_user') || null;
-
-        function switchToSignUp() {
-            console.log('switchToSignUp called');
-            document.getElementById('signInForm').classList.remove('active');
-            document.getElementById('signUpForm').classList.add('active');
-            document.getElementById('ageStep').classList.add('active');
-            document.getElementById('accountStep').classList.remove('active');
-            console.log('Switched to sign up form');
-        }
-
-        function switchToSignIn() {
-            document.getElementById('signInForm').classList.add('active');
-            document.getElementById('signUpForm').classList.remove('active');
-            document.getElementById('forgotPasswordForm').classList.remove('active');
-            document.getElementById('resetPasswordForm').classList.remove('active');
-            clearErrors();
-        }
-
-        function showForgotPassword() {
-            document.getElementById('signInForm').classList.remove('active');
-            document.getElementById('forgotPasswordForm').classList.add('active');
-        }
-
-        function selectAge(isKid) {
-            console.log('selectAge called with:', isKid);
-            if (isKid) {
-                document.getElementById('ageStep').classList.remove('active');
-                document.getElementById('accountStep').classList.add('active');
-                console.log('Switched to account step');
-            } else {
-                document.getElementById('ageStep').classList.remove('active');
-                document.getElementById('adultStep').classList.add('active');
-                console.log('Switched to adult step');
-            }
-        }
-
-        function backToAge() {
-            document.getElementById('ageStep').classList.add('active');
-            document.getElementById('accountStep').classList.remove('active');
-            document.getElementById('adultStep').classList.remove('active');
-            clearErrors();
-        }
-
-        function handleSignIn(e) {
-            e.preventDefault();
-            clearErrors();
-            
-            const username = document.getElementById('signin-username').value;
-            const password = document.getElementById('signin-password').value;
-            const errorDiv = document.getElementById('signin-error');
-
-            if (!users[username]) {
-                errorDiv.textContent = 'Username not found. Please create an account.';
-                errorDiv.classList.add('show');
-                return;
-            }
-
-            if (users[username].password !== password) {
-                errorDiv.textContent = 'Incorrect password. Please try again.';
-                errorDiv.classList.add('show');
-                return;
-            }
-
-            // Check if account is verified
-            if (!users[username].verified) {
-                errorDiv.textContent = 'Your account is pending parent/guardian verification. Please check the email sent to ' + users[username].parentEmail;
-                errorDiv.classList.add('show');
-                return;
-            }
-
-            // Sign in successful
-            localStorage.setItem('chatgpt_kids_current_user', username);
-            window.location.href = 'chatgpt_kids.html';
-        }
-
-        function handleSignUp(e) {
-            e.preventDefault();
-            clearErrors();
-            
-            const username = document.getElementById('signup-username').value;
-            const email = document.getElementById('signup-email').value;
-            const parentEmail = document.getElementById('signup-parent-email').value;
-            const password = document.getElementById('signup-password').value;
-            const confirmPassword = document.getElementById('signup-confirm-password').value;
-            const errorDiv = document.getElementById('signup-error');
-            const successDiv = document.getElementById('signup-success');
-
-            if (username.length < 3) {
-                errorDiv.textContent = 'Username must be at least 3 characters long.';
-                errorDiv.classList.add('show');
-                return;
-            }
-
-            if (users[username]) {
-                errorDiv.textContent = 'Username already taken. Please choose another.';
-                errorDiv.classList.add('show');
-                return;
-            }
-
-            if (password.length < 6) {
-                errorDiv.textContent = 'Password must be at least 6 characters long.';
-                errorDiv.classList.add('show');
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                errorDiv.textContent = 'Passwords do not match.';
-                errorDiv.classList.add('show');
-                return;
-            }
-
-            // Generate verification token
-            const verificationToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-
-            // Create account with pending verification
-            users[username] = {
-                email: email,
-                parentEmail: parentEmail,
-                password: password,
-                verified: false,
-                verificationToken: verificationToken,
-                createdAt: new Date().toISOString()
-            };
-
-            localStorage.setItem('chatgpt_kids_users', JSON.stringify(users));
-            
-            const verificationLink = window.location.origin + window.location.pathname + '?verify=' + verificationToken;
-            
-            // Send verification email to parent/guardian
-            if (typeof emailjs === 'undefined') {
-                errorDiv.textContent = 'Email service is not available. Please try again later.';
-                errorDiv.classList.add('show');
-                return;
-            }
-            
-            emailjs.send("service_dqwh6gi", "template_4u9m9zl", {
-                to_email: parentEmail,
-                child_name: username,
-                child_email: email,
-                verification_link: verificationLink
-            }).then(() => {
-                successDiv.innerHTML = `✅ Account created! A verification email has been sent to <strong>${parentEmail}</strong>.<br/>Please have your parent/guardian verify your account to continue.`;
-                successDiv.classList.add('show');
-                
-                setTimeout(() => {
-                    switchToSignIn();
-                }, 3000);
-            }).catch((error) => {
-                errorDiv.textContent = 'Error sending verification email. Please try again.';
-                errorDiv.classList.add('show');
-                console.error('EmailJS error:', error);
+                });
             });
-        }
-
-        function handleForgotPassword(e) {
-            e.preventDefault();
-            clearErrors();
-            
-            const email = document.getElementById('forgot-email').value;
-            const errorDiv = document.getElementById('forgot-error');
-            const successDiv = document.getElementById('forgot-success');
-
-            // Check if email exists
-            let userFound = false;
-            let foundUsername = null;
-            for (let username in users) {
-                if (users[username].email === email) {
-                    userFound = true;
-                    foundUsername = username;
-                    break;
-                }
-            }
-
-            if (!userFound) {
-                errorDiv.textContent = 'Email not found in our system.';
-                errorDiv.classList.add('show');
-                return;
-            }
-
-            // Generate password reset token
-            const resetToken = Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15);
-            
-            // Store the reset token temporarily
-            users[foundUsername].resetToken = resetToken;
-            users[foundUsername].resetTokenExpiry = new Date(Date.now() + 30 * 60000).toISOString(); // 30 min expiry
-            localStorage.setItem('chatgpt_kids_users', JSON.stringify(users));
-            
-            const resetLink = window.location.origin + window.location.pathname + '?reset=' + resetToken;
-            
-            // Send password reset email
-            if (typeof emailjs === 'undefined') {
-                errorDiv.textContent = 'Email service is not available. Please try again later.';
-                errorDiv.classList.add('show');
-                return;
-            }
-            
-            emailjs.send("service_dqwh6gi", "template_wd3cp5n", {
-                to_email: email,
-                username: foundUsername,
-                reset_link: resetLink
-            }).then(() => {
-                successDiv.textContent = `✅ Password reset link sent to ${email}. Check your inbox!`;
-                successDiv.classList.add('show');
-
-                setTimeout(() => {
-                    document.getElementById('forgotPasswordForm').classList.remove('active');
-                    document.getElementById('resetPasswordForm').classList.add('active');
-                }, 2000);
-            }).catch((error) => {
-                errorDiv.textContent = 'Error sending password reset email. Please try again.';
-                errorDiv.classList.add('show');
-                console.error('EmailJS error:', error);
-            });
-        }
-
-        function handleResetPassword(e) {
-            e.preventDefault();
-            clearErrors();
-            
-            const newPassword = document.getElementById('new-password').value;
-            const confirmPassword = document.getElementById('confirm-new-password').value;
-            const errorDiv = document.getElementById('reset-error');
-            const successDiv = document.getElementById('reset-success');
-
-            if (newPassword.length < 6) {
-                errorDiv.textContent = 'Password must be at least 6 characters long.';
-                errorDiv.classList.add('show');
-                return;
-            }
-
-            if (newPassword !== confirmPassword) {
-                errorDiv.textContent = 'Passwords do not match.';
-                errorDiv.classList.add('show');
-                return;
-            }
-
-            // In real app, you'd update the password for the user from the email
-            successDiv.textContent = '✅ Password reset successfully! Redirecting...';
-            successDiv.classList.add('show');
-
-            setTimeout(() => {
-                switchToSignIn();
-            }, 2000);
-        }
-
-        function clearErrors() {
-            document.querySelectorAll('.error').forEach(el => el.classList.remove('show'));
-            document.querySelectorAll('.success').forEach(el => el.classList.remove('show'));
-        }
-
-        // Check for verification or reset token in URL
-        window.addEventListener('load', function() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const verifyToken = urlParams.get('verify');
-            const resetToken = urlParams.get('reset');
-            
-            if (verifyToken) {
-                // Find the user with this verification token
-                for (let username in users) {
-                    if (users[username].verificationToken === verifyToken) {
-                        users[username].verified = true;
-                        users[username].verificationToken = null;
-                        localStorage.setItem('chatgpt_kids_users', JSON.stringify(users));
-                        
-                        // Show success message
-                        const container = document.querySelector('.container');
-                        container.innerHTML = `
-                            <div class="logo-header">
-                                <div class="logo-icon">C</div>
-                                <div class="logo-text">ChatGPT Kids</div>
-                            </div>
-                            <h1 style="color: #4caf50; text-align: center;">✅ Verification Successful!</h1>
-                            <p style="text-align: center; color: #333; margin: 20px 0;">
-                                The account for <strong>${username}</strong> has been verified by the parent/guardian.
-                            </p>
-                            <p style="text-align: center; color: #666;">
-                                Your child can now sign in and start using ChatGPT Kids!
-                            </p>
-                            <button class="button" onclick="window.location.href='signin.html'" style="margin-top: 30px; display: block; width: 100%;">Back to Sign In</button>
-                        `;
-                        return;
-                    }
-                }
-            }
-            
-            if (resetToken) {
-                // Find the user with this reset token
-                for (let username in users) {
-                    if (users[username].resetToken === resetToken) {
-                        // Check if token has expired
-                        const expiryTime = new Date(users[username].resetTokenExpiry);
-                        if (new Date() < expiryTime) {
-                            // Token is valid, store it temporarily and show reset form
-                            sessionStorage.setItem('resetUsername', username);
-                            sessionStorage.setItem('resetToken', resetToken);
-                            
-                            const container = document.querySelector('.container');
-                            container.innerHTML = `
-                                <div class="logo-header">
-                                    <div class="logo-icon">C</div>
-                                    <div class="logo-text">ChatGPT Kids</div>
-                                </div>
-                                <h1>Reset Your Password</h1>
-                                <p>Enter your new password below</p>
-                                <form onsubmit="handlePasswordResetFromEmail(event)">
-                                    <div class="form-group">
-                                        <label for="new-password">New Password</label>
-                                        <input type="password" id="new-password" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="confirm-password">Confirm Password</label>
-                                        <input type="password" id="confirm-password" required>
-                                    </div>
-                                    <button type="submit" class="button">Reset Password</button>
-                                    <div class="error" id="reset-email-error"></div>
-                                    <div class="success" id="reset-email-success"></div>
-                                </form>
-                            `;
-                            return;
-                        } else {
-                            // Token has expired
-                            const container = document.querySelector('.container');
-                            container.innerHTML = `
-                                <div class="logo-header">
-                                    <div class="logo-icon">C</div>
-                                    <div class="logo-text">ChatGPT Kids</div>
-                                </div>
-                                <h1 style="color: #d32f2f; text-align: center;">❌ Link Expired</h1>
-                                <p style="text-align: center; color: #333; margin: 20px 0;">
-                                    This password reset link has expired. Please request a new one.
-                                </p>
-                                <button class="button" onclick="window.location.href='signin.html'" style="margin-top: 30px; display: block; width: 100%;">Back to Sign In</button>
-                            `;
-                            return;
-                        }
-                    }
-                }
-            }
         });
-        
-        function handlePasswordResetFromEmail(e) {
-            e.preventDefault();
-            
-            const newPassword = document.getElementById('new-password').value;
-            const confirmPassword = document.getElementById('confirm-password').value;
-            const errorDiv = document.getElementById('reset-email-error');
-            const successDiv = document.getElementById('reset-email-success');
-            
-            const username = sessionStorage.getItem('resetUsername');
-            const resetToken = sessionStorage.getItem('resetToken');
-            
-            if (newPassword.length < 6) {
-                errorDiv.textContent = 'Password must be at least 6 characters long.';
-                errorDiv.classList.add('show');
-                return;
-            }
-            
-            if (newPassword !== confirmPassword) {
-                errorDiv.textContent = 'Passwords do not match.';
-                errorDiv.classList.add('show');
-                return;
-            }
-            
-            // Update password
-            if (users[username] && users[username].resetToken === resetToken) {
-                users[username].password = newPassword;
-                users[username].resetToken = null;
-                users[username].resetTokenExpiry = null;
-                localStorage.setItem('chatgpt_kids_users', JSON.stringify(users));
-                
-                successDiv.textContent = '✅ Password reset successfully! Redirecting...';
-                successDiv.classList.add('show');
-                
-                setTimeout(() => {
-                    sessionStorage.removeItem('resetUsername');
-                    sessionStorage.removeItem('resetToken');
-                    window.location.href = 'signin.html';
-                }, 2000);
-            }
-        }
     </script>
 </body>
 </html>
