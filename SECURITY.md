@@ -144,9 +144,8 @@ chmod +x .git/hooks/pre-commit
    ```
 
 ### Notify:
-- [ ] Security team
-- [ ] Users affected
 - [ ] Services that use the credential
+- [ ] Any affected users
 
 ---
 
@@ -163,11 +162,22 @@ chmod +x .git/hooks/pre-commit
 ## 🤝 Reporting Security Issues
 
 If you discover a security vulnerability:
-1. **Do NOT** create a public issue
-2. Email security details to your security team
+
+### Primary Contact:
+- **Email:** ryan.cod@[your-domain].com (replace with your actual email)
+- **GitHub Issues:** For non-sensitive issues only
+
+### Responsible Disclosure Guidelines:
+1. **Do NOT** create a public issue for security vulnerabilities
+2. Email security details to the contact above
 3. Include affected version and proof of concept
 4. Allow 90 days for remediation before public disclosure
+5. We will acknowledge receipt within 48 hours
+
+### Backup Plans:
+- If email fails, create a **private security advisory** in GitHub (Settings > Security > Advisory database)
+- Alternatively, reach out via GitHub profile or check repository for additional contact info
 
 ---
 
-**Last Updated:** 2026-06-09
+**Last Updated:** 2026-06-12
