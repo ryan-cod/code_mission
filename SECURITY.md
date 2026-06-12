@@ -161,22 +161,21 @@ chmod +x .git/hooks/pre-commit
 
 ## 🤝 Reporting Security Issues
 
-If you discover a security vulnerability:
+If you discover a security vulnerability, please report it privately using GitHub's Security Advisory feature:
 
-### Primary Contact:
-- **Email:** ryanroy056@gmail.com
-- **GitHub Issues:** For non-sensitive issues only
+### How to Report:
+1. Go to **Settings > Security > Advisory database** in this repository
+2. Click **Report a vulnerability**
+3. Fill in the vulnerability details
+4. Submit the report
+
+This ensures your report is kept private and only visible to the repository maintainer until a fix is released.
 
 ### Responsible Disclosure Guidelines:
-1. **Do NOT** create a public issue for security vulnerabilities
-2. Email security details to the contact above
-3. Include affected version and proof of concept
-4. Allow 90 days for remediation before public disclosure
-5. We will acknowledge receipt within 48 hours
-
-### Backup Plans:
-- If email fails, create a **private security advisory** in GitHub (Settings > Security > Advisory database)
-- Alternatively, reach out via GitHub profile or check repository for additional contact info
+- **Do NOT** create a public issue for security vulnerabilities
+- Include affected version and proof of concept
+- Allow 90 days for remediation before public disclosure
+- We will acknowledge receipt and work on a fix
 
 ---
 
