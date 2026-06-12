@@ -164,7 +164,7 @@ chmod +x .git/hooks/pre-commit
 If you discover a security vulnerability:
 
 ### Primary Contact:
-- **Email:** ryan.cod@[your-domain].com (replace with your actual email)
+- **Email:** ryanroy056@gmail.com
 - **GitHub Issues:** For non-sensitive issues only
 
 ### Responsible Disclosure Guidelines:
