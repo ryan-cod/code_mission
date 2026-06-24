@@ -1,0 +1,24 @@
+topics to understand in Python include:
+1. data types and variables
+2. what is control flow if, else, loops, functions 
+
+# data types in Python include: 
+- Integers (int)
+- Floating point numbers (float)
+- Strings (str)
+- Booleans (bool)
+
+
+# what is variable in Python?
+A variable in Python is a named location used to store data in the memory. It acts as a container for values that can be changed during program execution. Variables are created by assigning a value to a name using the assignment operator `=`. For example:
+
+```python
+x = 10  # x is a variable that holds an integer value
+name = "Alice"  # name is a variable that holds a string value
+is_active = True  # is_active is a variable that holds a boolean value
+```
+eg: furnitures=["chair", "table", "sofa"]  # furnitures is a variable that holds a list of strings
+
+a=2 b=5 c=7
+
+a=9 b=4 c=a-b=5

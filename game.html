@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catch Game</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, system-ui, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at top, #25314f 0%, #090d16 60%);
+      color: #eef2ff;
+    }
+
+    #container {
+      position: relative;
+      width: min(100%, 720px);
+      background: rgba(255, 255, 255, 0.06);
+      border: 2px solid rgba(255, 255, 255, 0.18);
+      border-radius: 18px;
+      box-shadow: 0 22px 80px rgba(0, 0, 0, 0.4);
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #0c162f;
+    }
+
+    #hud {
+      position: absolute;
+      inset: 16px auto auto 16px;
+      display: grid;
+      gap: 10px;
+      align-items: center;
+      pointer-events: none;
+    }
+
+    #score,
+    #message {
+      background: rgba(7, 15, 32, 0.88);
+      padding: 12px 16px;
+      border-radius: 14px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.2);
+      font-size: 0.98rem;
+      line-height: 1.4;
+      pointer-events: none;
+    }
+
+    #restart {
+      position: absolute;
+      right: 16px;
+      top: 16px;
+      padding: 10px 18px;
+      border: none;
+      border-radius: 999px;
+      background: #60a5fa;
+      color: #07101d;
+      font-weight: 700;
+      cursor: pointer;
+      pointer-events: auto;
+      transition: transform 0.2s ease, background 0.2s ease;
+    }
+
+    #restart:hover {
+      transform: translateY(-1px);
+      background: #93c5fd;
+    }
+
+    .hint {
+      position: absolute;
+      inset: auto 16px 20px 16px;
+      margin: 0;
+      padding: 12px 16px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #dbeafe;
+      font-size: 0.92rem;
+      pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="container">
+    <canvas id="game" width="720" height="480"></canvas>
+    <div id="hud">
+      <div id="score">Score: 0</div>
+      <div id="message">Click or tap to move the catcher. Catch the target before it escapes.</div>
+    </div>
+    <button id="restart">Restart</button>
+    <div class="hint">Pointer click to send the blue catcher toward the spot.</div>
+  </div>
+  <script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const scoreLabel = document.getElementById('score');
+    const messageLabel = document.getElementById('message');
+    const restartButton = document.getElementById('restart');
+
+    const bounds = { width: canvas.width, height: canvas.height };
+    const player = {
+      x: bounds.width * 0.18,
+      y: bounds.height * 0.55,
+      radius: 20,
+      speed: 320,
+      color: '#60a5fa',
+      destX: null,
+      destY: null,
+    };
+
+    const target = {
+      x: bounds.width * 0.78,
+      y: bounds.height * 0.35,
+      radius: 18,
+      vx: 120,
+      vy: 110,
+      color: '#f97316',
+    };
+
+    const pointer = { x: bounds.width / 2, y: bounds.height / 2, active: false };
+    let score = 0;
+    let lastTime = performance.now();
+    let playing = true;
+    let escapeTimer = 0;
+
+    function randomBetween(min, max) {
+      return min + Math.random() * (max - min);
+    }
+
+    function setDestination(x, y) {
+      player.destX = Math.max(player.radius, Math.min(bounds.width - player.radius, x));
+      player.destY = Math.max(player.radius, Math.min(bounds.height - player.radius, y));
+      messageLabel.textContent = 'Chasing the target...';
+    }
+
+    function respawnTarget() {
+      target.x = randomBetween(target.radius + 20, bounds.width - target.radius - 20);
+      target.y = randomBetween(target.radius + 20, bounds.height - target.radius - 20);
+      target.vx = randomBetween(100, 180) * (Math.random() > 0.5 ? 1 : -1);
+      target.vy = randomBetween(90, 160) * (Math.random() > 0.5 ? 1 : -1);
+      escapeTimer = 0;
+    }
+
+    function resetGame() {
+      score = 0;
+      player.x = bounds.width * 0.18;
+      player.y = bounds.height * 0.55;
+      player.destX = player.x;
+      player.destY = player.y;
+      respawnTarget();
+      playing = true;
+      messageLabel.textContent = 'Click or tap to move the catcher. Catch the target before it escapes.';
+      scoreLabel.textContent = 'Score: 0';
+    }
+
+    function update(dt) {
+      if (!playing) return;
+
+      if (player.destX !== null) {
+        const dx = player.destX - player.x;
+        const dy = player.destY - player.y;
+        const dist = Math.hypot(dx, dy);
+        if (dist > 1) {
+          const step = Math.min(player.speed * dt, dist);
+          player.x += (dx / dist) * step;
+          player.y += (dy / dist) * step;
+        }
+      }
+
+      target.x += target.vx * dt;
+      target.y += target.vy * dt;
+      if (target.x < target.radius || target.x > bounds.width - target.radius) {
+        target.vx *= -1;
+        target.x = Math.max(target.radius, Math.min(bounds.width - target.radius, target.x));
+      }
+      if (target.y < target.radius || target.y > bounds.height - target.radius) {
+        target.vy *= -1;
+        target.y = Math.max(target.radius, Math.min(bounds.height - target.radius, target.y));
+      }
+
+      escapeTimer += dt;
+      if (escapeTimer > 4.5) {
+        messageLabel.textContent = 'Target escaped. Keep clicking to chase it!';
+        if (escapeTimer > 6.5) {
+          respawnTarget();
+        }
+      }
+
+      const catchDistance = player.radius + target.radius - 4;
+      const dx = target.x - player.x;
+      const dy = target.y - player.y;
+      if (Math.hypot(dx, dy) < catchDistance) {
+        score += 1;
+        scoreLabel.textContent = `Score: ${score}`;
+        messageLabel.textContent = 'Nice catch! Tap to chase the next one.';
+        respawnTarget();
+        player.destX = player.x;
+        player.destY = player.y;
+      }
+    }
+
+    function drawCircle(circle, fill, stroke) {
+      ctx.beginPath();
+      ctx.arc(circle.x, circle.y, circle.radius, 0, Math.PI * 2);
+      if (fill) {
+        ctx.fillStyle = fill;
+        ctx.fill();
+      }
+      if (stroke) {
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+      }
+    }
+
+    function render() {
+      ctx.clearRect(0, 0, bounds.width, bounds.height);
+      ctx.fillStyle = '#0c162f';
+      ctx.fillRect(0, 0, bounds.width, bounds.height);
+
+      const gradient = ctx.createRadialGradient(target.x, target.y, 0, target.x, target.y, target.radius * 3);
+      gradient.addColorStop(0, 'rgba(249, 115, 22, 0.25)');
+      gradient.addColorStop(1, 'transparent');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, bounds.width, bounds.height);
+
+      drawCircle(target, target.color, '#fb923c');
+      drawCircle({ x: target.x - 6, y: target.y - 6, radius: 4 }, '#fff');
+      drawCircle({ x: target.x + 6, y: target.y - 6, radius: 4 }, '#fff');
+      ctx.fillStyle = '#111827';
+      ctx.beginPath();
+      ctx.arc(target.x - 6, target.y - 6, 2, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(target.x + 6, target.y - 6, 2, 0, Math.PI * 2);
+      ctx.fill();
+
+      drawCircle(player, player.color, '#93c5fd');
+      drawCircle({ x: player.x, y: player.y, radius: 10 }, '#e0f2fe');
+
+      if (pointer.active) {
+        ctx.strokeStyle = '#f8fafc';
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.arc(pointer.x, pointer.y, 16, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.fillStyle = 'rgba(248, 250, 252, 0.14)';
+        ctx.fillRect(pointer.x - 14, pointer.y + 12, 6, 16);
+        ctx.fillRect(pointer.x - 2, pointer.y + 12, 6, 16);
+      }
+
+      ctx.fillStyle = '#fff';
+      ctx.font = '600 14px Inter, system-ui, sans-serif';
+      ctx.fillText('Target', target.x - 24, target.y - target.radius - 10);
+      ctx.fillStyle = '#bbf7d0';
+      ctx.fillText('Catcher', player.x - 34, player.y - player.radius - 10);
+    }
+
+    function loop(now) {
+      const dt = Math.min((now - lastTime) / 1000, 0.033);
+      lastTime = now;
+      update(dt);
+      render();
+      requestAnimationFrame(loop);
+    }
+
+    function updatePointer(event) {
+      const rect = canvas.getBoundingClientRect();
+      pointer.x = ((event.clientX - rect.left) / rect.width) * bounds.width;
+      pointer.y = ((event.clientY - rect.top) / rect.height) * bounds.height;
+      pointer.active = true;
+    }
+
+    canvas.addEventListener('pointermove', updatePointer);
+    canvas.addEventListener('pointerdown', (event) => {
+      updatePointer(event);
+      setDestination(pointer.x, pointer.y);
+    });
+    canvas.addEventListener('pointerleave', () => {
+      pointer.active = false;
+    });
+    restartButton.addEventListener('click', resetGame);
+
+    resetGame();
+    requestAnimationFrame(loop);
+  </script>
+</body>
+</html>
