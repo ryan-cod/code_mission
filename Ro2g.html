@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ro2g Arena</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background: radial-gradient(circle at top, #2d4c8f, #0f172a 70%);
+      color: #f8fafc;
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+
+    .app {
+      width: min(100%, 980px);
+      background: rgba(15, 23, 42, 0.92);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      overflow: hidden;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      background: linear-gradient(90deg, #7c3aed, #2563eb);
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 1.6rem;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      padding: 16px 24px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      background: rgba(255,255,255,0.04);
+    }
+
+    .controls label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+    }
+
+    input[type="range"] {
+      accent-color: #38bdf8;
+      width: 120px;
+    }
+
+    button {
+      border: none;
+      padding: 10px 16px;
+      border-radius: 999px;
+      font-weight: 700;
+      cursor: pointer;
+      background: #38bdf8;
+      color: #0f172a;
+      transition: transform 0.15s ease;
+    }
+
+    button:hover { transform: translateY(-1px); }
+
+    #status {
+      margin: 0;
+      font-size: 1rem;
+      color: #cbd5e1;
+    }
+
+    canvas {
+      display: block;
+      width: 100%;
+      height: auto;
+      background: #0f172a;
+    }
+
+    .legend {
+      padding: 12px 24px 20px;
+      color: #cbd5e1;
+      font-size: 0.95rem;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <h1>Ro2g Arena</h1>
+      <div id="status">Pick a crew size from 1 to 4 players.</div>
+    </div>
+
+    <div class="controls">
+      <label for="playerCount">
+        Players:
+        <input id="playerCount" type="range" min="1" max="4" value="2" />
+        <span id="playerCountLabel">2</span>
+      </label>
+      <button id="startBtn">Start Game</button>
+      <button id="resetBtn">Reset</button>
+    </div>
+
+    <canvas id="gameCanvas" width="900" height="500"></canvas>
+
+    <div class="legend">
+      <span>Player 1: WASD</span>
+      <span>Player 2: Arrow Keys</span>
+      <span>Player 3: I/J/K/L</span>
+      <span>Player 4: Numpad 8/4/5/6</span>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('gameCanvas');
+    const ctx = canvas.getContext('2d');
+    const playerCountInput = document.getElementById('playerCount');
+    const playerCountLabel = document.getElementById('playerCountLabel');
+    const statusEl = document.getElementById('status');
+    const startBtn = document.getElementById('startBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    const keys = {};
+    const colors = ['#38bdf8', '#f59e0b', '#34d399', '#f43f5e'];
+
+    const level = {
+      width: canvas.width,
+      height: canvas.height,
+      finishX: canvas.width - 90,
+      finishY: canvas.height / 2,
+      obstacles: [
+        { x: 220, y: 120, w: 140, h: 24 },
+        { x: 420, y: 280, w: 150, h: 24 },
+        { x: 620, y: 110, w: 24, h: 180 }
+      ]
+    };
+
+    let players = [];
+    let stars = [];
+    let gameRunning = false;
+    let lastTime = 0;
+
+    function updatePlayerCountLabel() {
+      const value = Number(playerCountInput.value);
+      playerCountLabel.textContent = value;
+    }
+
+    function createStars() {
+      stars = [];
+      for (let i = 0; i < 10; i += 1) {
+        stars.push({
+          x: 80 + i * 70,
+          y: 80 + ((i % 3) * 90),
+          radius: 8,
+          collected: false
+        });
+      }
+    }
+
+    function resetPlayers() {
+      const count = Number(playerCountInput.value);
+      players = Array.from({ length: count }, (_, index) => ({
+        x: 60 + index * 65,
+        y: 70 + index * 40,
+        radius: 16,
+        color: colors[index],
+        name: `Player ${index + 1}`,
+        controls: getControls(index),
+        finished: false,
+        score: 0,
+        speed: 2.7
+      }));
+      gameRunning = false;
+      statusEl.textContent = `Lobby ready for ${count} player${count > 1 ? 's' : ''}.`;
+      createStars();
+    }
+
+    function getControls(index) {
+      const presets = [
+        { up: 'w', down: 's', left: 'a', right: 'd' },
+        { up: 'ArrowUp', down: 'ArrowDown', left: 'ArrowLeft', right: 'ArrowRight' },
+        { up: 'i', down: 'k', left: 'j', right: 'l' },
+        { up: '8', down: '5', left: '4', right: '6' }
+      ];
+      return presets[index] || presets[0];
+    }
+
+    function startGame() {
+      resetPlayers();
+      gameRunning = true;
+      statusEl.textContent = 'Game started! Race to the finish line.';
+    }
+
+    function collidesWithObstacle(player) {
+      return level.obstacles.some(obstacle => {
+        const px = player.x;
+        const py = player.y;
+        return px + player.radius > obstacle.x &&
+               px - player.radius < obstacle.x + obstacle.w &&
+               py + player.radius > obstacle.y &&
+               py - player.radius < obstacle.y + obstacle.h;
+      });
+    }
+
+    function updatePlayer(player) {
+      const { left, right, up, down } = player.controls;
+      let dx = 0;
+      let dy = 0;
+
+      if (keys[left]) dx -= 1;
+      if (keys[right]) dx += 1;
+      if (keys[up]) dy -= 1;
+      if (keys[down]) dy += 1;
+
+      if (dx !== 0 || dy !== 0) {
+        const length = Math.hypot(dx, dy) || 1;
+        dx /= length;
+        dy /= length;
+        player.x += dx * player.speed;
+        player.y += dy * player.speed;
+      }
+
+      player.x = Math.max(player.radius, Math.min(level.width - player.radius, player.x));
+      player.y = Math.max(player.radius, Math.min(level.height - player.radius, player.y));
+
+      if (collidesWithObstacle(player)) {
+        player.x -= dx * player.speed;
+        player.y -= dy * player.speed;
+      }
+
+      stars.forEach(star => {
+        if (!star.collected && Math.hypot(player.x - star.x, player.y - star.y) < 20) {
+          star.collected = true;
+          player.score += 1;
+        }
+      });
+
+      const finishDistance = Math.hypot(player.x - level.finishX, player.y - level.finishY);
+      if (finishDistance < 38) {
+        player.finished = true;
+      }
+    }
+
+    function drawBackground() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      gradient.addColorStop(0, '#111827');
+      gradient.addColorStop(1, '#1e3a8a');
+      ctx.fillStyle = gradient;
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#0f766e';
+      ctx.fillRect(0, 0, canvas.width, 40);
+      ctx.fillRect(0, canvas.height - 40, canvas.width, 40);
+
+      level.obstacles.forEach(obstacle => {
+        ctx.fillStyle = '#64748b';
+        ctx.fillRect(obstacle.x, obstacle.y, obstacle.w, obstacle.h);
+      });
+
+      ctx.fillStyle = '#fbbf24';
+      ctx.fillRect(level.finishX - 20, level.finishY - 40, 40, 80);
+      ctx.fillStyle = '#fef3c7';
+      ctx.fillRect(level.finishX - 15, level.finishY - 35, 30, 70);
+
+      stars.forEach(star => {
+        if (!star.collected) {
+          ctx.beginPath();
+          ctx.fillStyle = '#facc15';
+          ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+    }
+
+    function drawPlayers() {
+      players.forEach((player, index) => {
+        ctx.beginPath();
+        ctx.fillStyle = player.color;
+        ctx.arc(player.x, player.y, player.radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fff';
+        ctx.font = '12px sans-serif';
+        ctx.fillText(player.name, player.x - 24, player.y - 24);
+        ctx.font = '11px sans-serif';
+        ctx.fillText(`Stars ${player.score}`, player.x - 18, player.y + 32);
+        if (player.finished) {
+          ctx.fillStyle = '#fef3c7';
+          ctx.fillText('Finished', player.x - 16, player.y + 46);
+        }
+      });
+    }
+
+    function drawHud() {
+      ctx.fillStyle = 'rgba(15, 23, 42, 0.7)';
+      ctx.fillRect(20, 18, 220, 36);
+      ctx.fillStyle = '#f8fafc';
+      ctx.font = '14px sans-serif';
+      ctx.fillText(`Players ready: ${players.filter(p => !p.finished).length}`, 32, 42);
+    }
+
+    function tick(timestamp) {
+      if (!lastTime) lastTime = timestamp;
+      const delta = timestamp - lastTime;
+      lastTime = timestamp;
+
+      if (gameRunning) {
+        players.forEach(player => {
+          if (!player.finished) updatePlayer(player);
+        });
+
+        const finishedCount = players.filter(player => player.finished).length;
+        if (finishedCount === players.length && players.length > 0) {
+          gameRunning = false;
+          statusEl.textContent = 'All players reached the finish line!';
+        }
+      }
+
+      drawBackground();
+      drawPlayers();
+      drawHud();
+      requestAnimationFrame(tick);
+    }
+
+    window.addEventListener('keydown', event => {
+      keys[event.key] = true;
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'w', 'a', 's', 'd', 'i', 'j', 'k', 'l', '4', '5', '6', '8'].includes(event.key)) {
+        event.preventDefault();
+      }
+    });
+
+    window.addEventListener('keyup', event => {
+      keys[event.key] = false;
+    });
+
+    playerCountInput.addEventListener('input', updatePlayerCountLabel);
+    startBtn.addEventListener('click', startGame);
+    resetBtn.addEventListener('click', resetPlayers);
+
+    updatePlayerCountLabel();
+    resetPlayers();
+    requestAnimationFrame(tick);
+  </script>
+</body>
+</html>
+
