@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ET Arena</title>
+  <style>
+    body { margin:0; font-family:Arial,sans-serif; background:#111827; color:#f8fafc; }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 24px; }
+    .card { background:#0f172a; border:1px solid #fb923c; border-radius:16px; padding:20px; }
+    button { padding:10px 14px; border:none; border-radius:999px; background:#fb923c; color:#111827; font-weight:700; cursor:pointer; }
+    canvas { width:100%; border-radius:12px; background:#020617; margin-top:12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>ET Arena</h1>
+      <p>Collect energy orbs and survive the arena for as long as you can.</p>
+      <button id="startBtn">Start</button>
+      <a href="index.html" style="color:#fb923c; margin-left:10px;">Back to hub</a>
+      <canvas id="game" width="800" height="420"></canvas>
+    </div>
+  </div>
+  <script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const startBtn = document.getElementById('startBtn');
+    let running = false; let score = 0; let x = 120; let y = 200; let vx = 0; let vy = 0; const orb = {x: 550, y: 140};
+    const keys = {};
+    function draw() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle='#020617'; ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle='#fb923c'; ctx.beginPath(); ctx.arc(orb.x, orb.y, 10, 0, Math.PI*2); ctx.fill();
+      ctx.fillStyle='#38bdf8'; ctx.fillRect(x,y,24,24);
+      ctx.fillStyle='#f8fafc'; ctx.font='18px Arial'; ctx.fillText(`Score: ${score}`, 20, 24);
+    }
+    function tick() {
+      if (running) {
+        if (keys['ArrowLeft']||keys['a']) x -= 4;
+        if (keys['ArrowRight']||keys['d']) x += 4;
+        if (keys['ArrowUp']||keys['w']) y -= 4;
+        if (keys['ArrowDown']||keys['s']) y += 4;
+        x = Math.max(0, Math.min(canvas.width-24, x)); y = Math.max(0, Math.min(canvas.height-24, y));
+        if (Math.abs(x+12-orb.x)<20 && Math.abs(y+12-orb.y)<20){ score+=1; orb.x=80+Math.random()*640; orb.y=80+Math.random()*260; }
+      }
+      draw(); requestAnimationFrame(tick);
+    }
+    window.addEventListener('keydown', e=>{ keys[e.key]=true; e.preventDefault(); });
+    window.addEventListener('keyup', e=>{ keys[e.key]=false; });
+    startBtn.addEventListener('click', ()=>{ running=true; score=0; x=120; y=200; draw(); });
+    window.addEventListener('load', ()=>{ draw(); requestAnimationFrame(tick); });
+  </script>
+</body>
+</html>

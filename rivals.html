@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rivals</title>
+  <style>
+    body { margin:0; font-family:Arial,sans-serif; background:#140b14; color:#f8fafc; }
+    .wrap { max-width: 900px; margin: 0 auto; padding: 24px; }
+    .card { background:#231224; border:1px solid #7c3aed; border-radius:16px; padding:20px; }
+    button { padding:10px 14px; border:none; border-radius:999px; background:#f59e0b; color:#111827; font-weight:700; cursor:pointer; }
+    canvas { width:100%; border-radius:12px; background:#0f172a; margin-top:12px; }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <h1>Rivals</h1>
+      <p>Defuse the arena by hitting the moving targets before time runs out.</p>
+      <button id="startBtn">Start</button>
+      <a href="index.html" style="color:#f59e0b; margin-left:10px;">Back to hub</a>
+      <canvas id="game" width="800" height="420"></canvas>
+    </div>
+  </div>
+  <script>
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    const startBtn = document.getElementById('startBtn');
+    let score = 0; let time = 20; let running = false; let target = {x:100,y:100,r:20};
+    let last = 0;
+    function draw() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle='#0f172a'; ctx.fillRect(0,0,canvas.width,canvas.height);
+      ctx.fillStyle='#f59e0b'; ctx.beginPath(); ctx.arc(target.x,target.y,target.r,0,Math.PI*2); ctx.fill();
+      ctx.fillStyle='#f8fafc'; ctx.font='18px Arial'; ctx.fillText(`Score: ${score}   Time: ${time.toFixed(1)}`, 20, 24);
+    }
+    function reset() { score=0; time=20; target.x=100+Math.random()*600; target.y=80+Math.random()*260; draw(); }
+    canvas.addEventListener('click', (e)=>{ if(!running)return; const rect=canvas.getBoundingClientRect(); const x=e.clientX-rect.left; const y=e.clientY-rect.top; const dist=Math.hypot(x-target.x,y-target.y); if(dist<target.r){ score+=1; target.x=100+Math.random()*600; target.y=80+Math.random()*260; } draw(); });
+    startBtn.addEventListener('click', ()=>{ running=true; reset(); });
+    function tick(ts){ if(running){ if(!last) last=ts; const delta=(ts-last)/1000; last=ts; time-=delta; if(time<=0){ running=false; ctx.fillStyle='#fef3c7'; ctx.font='22px Arial'; ctx.fillText(`Game over! Final score: ${score}`, 220, 200); } }
+      draw(); requestAnimationFrame(tick); }
+    window.addEventListener('load', ()=>{ reset(); requestAnimationFrame(tick); });
+  </script>
+</body>
+</html>
